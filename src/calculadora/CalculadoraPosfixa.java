@@ -15,17 +15,19 @@ public class CalculadoraPosfixa {
 	public BigDecimal calcularExpressao(String expressao) {
 		String[] termos = expressao.split(" ");
 		for (String termo : termos) {
-			if (isOperator(termo)) {
+			
+			if (isOperator2(termo)) {
 				BigDecimal[] numeros = new BigDecimal[] { (BigDecimal) pilha.pop(), (BigDecimal) pilha.pop() };
 				pilha.push(calcularOperador2(numeros, termo));
 			} else {
 				pilha.push(new BigDecimal(termo));
 			}
+			
 		}
 		return (BigDecimal) pilha.pop();
 	}
 
-	private boolean isOperator(String termo) {
+	private boolean isOperator2(String termo) {
 		for (String string : operadores2) {
 			if (string.equals(termo)) {
 				return true;
@@ -53,4 +55,9 @@ public class CalculadoraPosfixa {
 	public void setPrecision(int precision) {
 		mathContext = new MathContext(precision, RoundingMode.HALF_EVEN);
 	}
+	
+	public void createOperation(){
+		
+	}
+	
 }
