@@ -7,7 +7,7 @@ public class Teste1 {
 		
 		CalculadoraPosfixa cal = new CalculadoraPosfixa();
 		
-		cal.setPrecision(50);
-		System.out.println(cal.calcularExpressao("2 3 / 2 ^"));
+		cal.setPrecision(10);
+		System.out.println(cal.calcularExpressao("1 2 - 3 + 5 /"));
 	}
 }
