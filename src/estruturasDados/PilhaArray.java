@@ -2,7 +2,7 @@ package estruturasDados;
 
 import estruturasDados.tads.Pilha;
 
-public class PilhaArray implements Pilha<Object> {
+public class PilhaArray<T> implements Pilha<T> {
 
 	private Object[] array;
 	private int topo;
@@ -13,7 +13,7 @@ public class PilhaArray implements Pilha<Object> {
 	}
 
 	@Override
-	public void push(Object elemento) {
+	public void push(T elemento) {
 		if (topo == -1) {
 			topo = 0;
 			array[topo] = elemento;
@@ -26,17 +26,19 @@ public class PilhaArray implements Pilha<Object> {
 	}
 
 	@Override
-	public Object pop() {
+	public T pop() {
 
 		if (topo == -1) {
 			return null;
 		} else {
-			Object retorno = array[topo];
+			@SuppressWarnings("unchecked")
+			T retorno = (T) array[topo];
 			array[topo--] = null;
 			return retorno;
 		}
 
 	}
+
 	@Override
 	public String toString() {
 		String retorno = "";

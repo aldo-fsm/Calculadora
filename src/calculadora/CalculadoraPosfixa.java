@@ -10,7 +10,7 @@ import estruturasDados.tads.Pilha;
 
 public class CalculadoraPosfixa {
 	private String[] operadores = { "+", "-", "*", "/", "^", "!" };
-	private PilhaArray pilha = new PilhaArray();
+	private Pilha<BigDecimal> pilha = new PilhaArray<BigDecimal>();
 	private MathContext mathContext = new MathContext(7, RoundingMode.HALF_EVEN);
 
 	/**
@@ -32,7 +32,7 @@ public class CalculadoraPosfixa {
 			}
 
 		}
-		return (BigDecimal) pilha.pop();
+		return pilha.pop();
 	}
 
 	private boolean isOperator(String termo) {
@@ -44,29 +44,29 @@ public class CalculadoraPosfixa {
 		return false;
 	}
 
-	private BigDecimal calcularOperador(Pilha pilha, String operador) {
+	private BigDecimal calcularOperador(Pilha<BigDecimal> pilha, String operador) {
 
 		BigDecimal[] numeros;
 
 		switch (operador) {
 
 		case "+":
-			numeros = new BigDecimal[] { (BigDecimal) pilha.pop(), (BigDecimal) pilha.pop() };
+			numeros = new BigDecimal[] { pilha.pop(), pilha.pop() };
 			return numeros[1].add(numeros[0]);
 		case "-":
-			numeros = new BigDecimal[] { (BigDecimal) pilha.pop(), (BigDecimal) pilha.pop() };
+			numeros = new BigDecimal[] { pilha.pop(), pilha.pop() };
 			return numeros[1].subtract(numeros[0]);
 		case "*":
-			numeros = new BigDecimal[] { (BigDecimal) pilha.pop(), (BigDecimal) pilha.pop() };
+			numeros = new BigDecimal[] { pilha.pop(), pilha.pop() };
 			return numeros[1].multiply(numeros[0]);
 		case "/":
-			numeros = new BigDecimal[] { (BigDecimal) pilha.pop(), (BigDecimal) pilha.pop() };
+			numeros = new BigDecimal[] { pilha.pop(), pilha.pop() };
 			return numeros[1].divide(numeros[0], mathContext);
 		case "^":
-			numeros = new BigDecimal[] { (BigDecimal) pilha.pop(), (BigDecimal) pilha.pop() };
+			numeros = new BigDecimal[] { pilha.pop(), pilha.pop() };
 			return numeros[1].pow(numeros[0].intValue());
 		case "!":
-			BigDecimal numero = (BigDecimal) pilha.pop();
+			BigDecimal numero = pilha.pop();
 			BigInteger resultado = BigInteger.ONE;
 			for (BigInteger i = numero.toBigInteger(); i.compareTo(BigInteger.ONE) > 0; i = i
 					.subtract(BigInteger.ONE)) {
