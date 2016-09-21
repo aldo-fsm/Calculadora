@@ -29,7 +29,7 @@ public class PilhaArray<T> implements Pilha<T> {
 	public T pop() {
 
 		if (topo == -1) {
-			return null;
+			throw new PilhaVaziaException("A pilha está vazia");
 		} else {
 			@SuppressWarnings("unchecked")
 			T retorno = (T) array[topo];
@@ -54,5 +54,9 @@ public class PilhaArray<T> implements Pilha<T> {
 			novoArray[i] = array[i];
 		}
 		array = novoArray;
+	}
+
+	public int size() {
+		return topo + 1;
 	}
 }
