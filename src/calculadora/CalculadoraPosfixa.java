@@ -9,6 +9,7 @@ import estruturasDados.PilhaArray;
 import estruturasDados.tads.Pilha;
 
 public class CalculadoraPosfixa {
+	
 	private String[] operadores = { "+", "-", "*", "/", "^", "!" };
 	private Pilha<BigDecimal> pilha = new PilhaArray<BigDecimal>();
 	private MathContext mathContext = new MathContext(7, RoundingMode.HALF_EVEN);
