@@ -1,10 +1,5 @@
 package calculadora;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
-import java.math.RoundingMode;
-
 import estruturasDados.PilhaArray;
 import estruturasDados.PilhaVaziaException;
 import estruturasDados.tads.Pilha;
@@ -12,8 +7,7 @@ import estruturasDados.tads.Pilha;
 public class CalculadoraPosfixa {
 
 	private String[] operadores = { "+", "-", "*", "/", "^", "!" };
-	private Pilha<BigDecimal> pilha = new PilhaArray<BigDecimal>();
-	private MathContext mathContext = new MathContext(7, RoundingMode.HALF_EVEN);
+	private Pilha<Double> pilha = new PilhaArray<Double>();
 
 	/**
 	 * Calcula uma expressão escrita em notação pos-fixa.
@@ -22,7 +16,7 @@ public class CalculadoraPosfixa {
 	 *            expressão a ser calculada.
 	 * @return resultado da expressão.
 	 */
-	public BigDecimal calcular(String expressao) {
+	public Double calcular(String expressao) {
 		String[] termos = expressao.split(" ");
 		for (String termo : termos) {
 			if (termo.equals(""))
@@ -34,13 +28,15 @@ public class CalculadoraPosfixa {
 					throw new IllegalArgumentException("Expressão pos-fixa mal formada");
 				}
 			} else {
-				pilha.push(new BigDecimal(termo));
+				pilha.push(new Double(termo));
 			}
 
 		}
 		if (pilha.size() > 1) {
 			throw new IllegalArgumentException("Expressão pos-fixa mal formada");
 		}
+		if (pilha.size() == 0)
+			throw new IllegalArgumentException("Expressão pos-fixa mal formada");
 		return pilha.pop();
 	}
 
@@ -53,64 +49,39 @@ public class CalculadoraPosfixa {
 		return false;
 	}
 
-	private BigDecimal calcularOperador(Pilha<BigDecimal> pilha, String operador) {
+	private Double calcularOperador(Pilha<Double> pilha, String operador) {
 
-		BigDecimal[] numeros;
+		Double[] numeros;
 
 		switch (operador) {
 
 		case "+":
-			numeros = new BigDecimal[] { pilha.pop(), pilha.pop() };
-			return numeros[1].add(numeros[0]);
+			return pilha.pop() + pilha.pop();
 		case "-":
-			numeros = new BigDecimal[] { pilha.pop(), pilha.pop() };
-			return numeros[1].subtract(numeros[0]);
+			numeros = new Double[] { pilha.pop(), pilha.pop() };
+			return numeros[1] - numeros[0];
 		case "*":
-			numeros = new BigDecimal[] { pilha.pop(), pilha.pop() };
-			return numeros[1].multiply(numeros[0]);
+			return pilha.pop() * pilha.pop();
 		case "/":
-			numeros = new BigDecimal[] { pilha.pop(), pilha.pop() };
-			return numeros[1].divide(numeros[0], mathContext);
+			numeros = new Double[] { pilha.pop(), pilha.pop() };
+			return numeros[1] / numeros[0];
 		case "^":
-			numeros = new BigDecimal[] { pilha.pop(), pilha.pop() };
-			if (isInteger(numeros[0])) {
-				return numeros[1].pow(numeros[0].intValue());
-			} else {
-				throw new UnsupportedOperationException("Potencia com expoente fracionario.");
-			}
+			numeros = new Double[] { pilha.pop(), pilha.pop() };
+			return Math.pow(numeros[1], numeros[0]);
 		case "!":
-			BigDecimal numero = pilha.pop();
-			if (isInteger(numero)) {
-				BigInteger resultado = BigInteger.ONE;
-				for (BigInteger i = numero.toBigInteger(); i.compareTo(BigInteger.ONE) > 0; i = i
-						.subtract(BigInteger.ONE)) {
-					resultado = resultado.multiply(i);
+			Double numero = pilha.pop();
+			if (numero.intValue() == numero) {
+				double resultado = 1;
+				for (int i = numero.intValue(); i > 1; i--) {
+					resultado *= i;
 				}
-				return new BigDecimal(resultado);
+				return resultado;
 			} else {
 				throw new ArithmeticException("Fatorial de numero fracionario.");
 			}
 		default:
 			return null;
 		}
-	}
-
-	private boolean isInteger(BigDecimal number) {
-		if (number.compareTo(new BigDecimal(number.toBigInteger())) == 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Determina a precisão dos calculos.
-	 * 
-	 * @param precision
-	 *            Numero de casas decimais para numeros sem representação exata.
-	 */
-	public void setPrecision(int precision) {
-		mathContext = new MathContext(precision, RoundingMode.HALF_EVEN);
 	}
 
 }
