@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 import calculadora.CalculadoraPosfixa;
 
-public class Teste2 {
+public class TesteCalculadoraPosFixa {
 
 	public static void main(String[] args) {
 
