@@ -1,9 +1,10 @@
 
 package arvore;
-
 import java.math.BigDecimal;
 import java.util.Scanner;
-import java.util.Stack;
+
+import lista.ListaArray;
+import pilha.pilhaArray;
 
 public class ArvoreExpressoes {
 	private Node<String> root;
@@ -19,8 +20,8 @@ public class ArvoreExpressoes {
 	}
 	public void armazeneExpressao(String expressao) {
 		String Operadores = "+-*/", valor;
-		Stack<String> pilhaOperadores = new Stack<String>();
-		Stack<Node<String>> pilhaArvores = new Stack<Node<String>>();
+		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
+		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
 		for (int i = 0; i < expressao.length(); i++) {
 			valor = "";
 			if (expressao.charAt(i) == ("(").charAt(0) && Operadores.indexOf(expressao.charAt(i)) == -1) {
@@ -97,30 +98,38 @@ public class ArvoreExpressoes {
 	}
 
 	public BigDecimal calcularExpressao() {
-		return auxCalcularExpressao(root);
+		ListaArray<String> variaveis = new ListaArray<String>(); 
+		ListaArray<BigDecimal> valoresCorrespondentes = new ListaArray<BigDecimal>();
+		return auxCalcularExpressao(root,variaveis,valoresCorrespondentes);
 	}
-
-	private BigDecimal auxCalcularExpressao(Node<String> raiz){
+	
+	private BigDecimal auxCalcularExpressao(Node<String> raiz, ListaArray<String> variaveis,ListaArray<BigDecimal> valoresCorrespondentes){
 		if(root != null){
 			if(raiz.getLeftNode() == null && raiz.getRightNode() == null){
 				String numeros = "0123456789";
 				if(numeros.indexOf(raiz.getElemento().charAt(0)) == -1){
-					System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
-					Scanner sc = new Scanner(System.in);
-					BigDecimal tmp = new BigDecimal(sc.nextInt());
-					return tmp;
+					if(variaveis.contem(raiz.getElemento().charAt(0)+"")){
+						return valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0)+""));
+					}else{
+						variaveis.adicionar(raiz.getElemento().charAt(0) + "");
+						System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
+						Scanner sc = new Scanner(System.in);
+						BigDecimal tmp = new BigDecimal(sc.nextInt());
+						valoresCorrespondentes.adicionar(tmp);
+						return tmp;
+					}
 				}
 				return new BigDecimal(raiz.getElemento());
 			}
 			switch (raiz.getElemento()) {
 			case "*":
-				return auxCalcularExpressao(raiz.getLeftNode()).multiply(auxCalcularExpressao(raiz.getRightNode()));
+				return auxCalcularExpressao(raiz.getLeftNode(),variaveis,valoresCorrespondentes).multiply(auxCalcularExpressao(raiz.getRightNode(),variaveis,valoresCorrespondentes));
 			case "/":
-				return auxCalcularExpressao(raiz.getLeftNode()).divide(auxCalcularExpressao(raiz.getRightNode()));
+				return auxCalcularExpressao(raiz.getLeftNode(),variaveis,valoresCorrespondentes).divide(auxCalcularExpressao(raiz.getRightNode(),variaveis,valoresCorrespondentes),15,BigDecimal.ROUND_FLOOR);
 			case "-":
-				return auxCalcularExpressao(raiz.getLeftNode()).subtract(auxCalcularExpressao(raiz.getRightNode()));
+				return auxCalcularExpressao(raiz.getLeftNode(),variaveis,valoresCorrespondentes).subtract(auxCalcularExpressao(raiz.getRightNode(),variaveis,valoresCorrespondentes));
 			case "+":
-				return auxCalcularExpressao(raiz.getLeftNode()).add(auxCalcularExpressao(raiz.getRightNode()));
+				return auxCalcularExpressao(raiz.getLeftNode(),variaveis,valoresCorrespondentes).add(auxCalcularExpressao(raiz.getRightNode(),variaveis,valoresCorrespondentes));
 			}
 		}
 		return BigDecimal.ZERO;
