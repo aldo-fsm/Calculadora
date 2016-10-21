@@ -1,4 +1,3 @@
-
 package arvore;
 import java.math.BigDecimal;
 import java.util.Scanner;
@@ -9,20 +8,29 @@ import pilha.pilhaArray;
 public class ArvoreExpressoes {
 	private Node<String> root;
 
-	private void realocarNode(Node<String> novoElemento) {
-		if (root == null) {
-			root = novoElemento;
-		} else if (root.getRightNode() == null) {
-			root.setRightNode(novoElemento);
-		} else if (root.getLeftNode() == null) {
-			root.setLeftNode(novoElemento);
-		}
+	public void acrescentaNaExpressao(String expressao){
+		tradutorDeExpressoes("(" + expressaoEmOrdem() + expressao + ")");
 	}
+	
 	public void armazeneExpressao(String expressao) {
+		tradutorDeExpressoes(expressao);
+	}
+		
+	public String expressaoEmOrdem() {
+		return auxExpressaoEmOrdem(root);
+	}
+	
+	public BigDecimal calcularExpressao() {
+		ListaArray<String> variaveis = new ListaArray<String>(); 
+		ListaArray<BigDecimal> valoresCorrespondentes = new ListaArray<BigDecimal>();
+		return auxCalcularExpressao(root,variaveis,valoresCorrespondentes);
+	}
+	
+	private void tradutorDeExpressoes(String expressao){
 		root = null;
-		String Operadores = "+-*/", valor;
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
+		String Operadores = "+-*/", valor;
 		for (int i = 0; i < expressao.length(); i++) {
 			if(expressao.charAt(i) == (" ").charAt(0)){
 				continue;
@@ -80,32 +88,28 @@ public class ArvoreExpressoes {
 			}
 		}
 		Node<String> novoElemento = new Node<String>();
-		realocarNode(pilhaArvores.pop());
+		adicionarNode(pilhaArvores.pop());
 	}
 
-	public void expressaoArmazenada() {
-		auxExpressaoArmazenada(root);
-		System.out.println("");
-	}
-
-	private void auxExpressaoArmazenada(Node<String> node) {
+	private String auxExpressaoEmOrdem(Node<String> node) {
 		if (node != null) {
 			if (node.getLeftNode() == null && node.getRightNode() == null) {
-				System.out.print(node.getElemento());
+				return node.getElemento();
 			} else {
-				System.out.print("(");
-				auxExpressaoArmazenada(node.getLeftNode());
-				System.out.print(node.getElemento());
-				auxExpressaoArmazenada(node.getRightNode());
-				System.out.print(")");
+				return "(" + auxExpressaoEmOrdem(node.getLeftNode()) + node.getElemento() + auxExpressaoEmOrdem(node.getRightNode()) + ")";
 			}
 		}
+		return null;
 	}
 
-	public BigDecimal calcularExpressao() {
-		ListaArray<String> variaveis = new ListaArray<String>(); 
-		ListaArray<BigDecimal> valoresCorrespondentes = new ListaArray<BigDecimal>();
-		return auxCalcularExpressao(root,variaveis,valoresCorrespondentes);
+	private void adicionarNode(Node<String> novoElemento) {
+		if (root == null) {
+			root = novoElemento;
+		} else if (root.getRightNode() == null) {
+			root.setRightNode(novoElemento);
+		} else if (root.getLeftNode() == null) {
+			root.setLeftNode(novoElemento);
+		}
 	}
 	
 	private BigDecimal auxCalcularExpressao(Node<String> raiz, ListaArray<String> variaveis,ListaArray<BigDecimal> valoresCorrespondentes){
@@ -119,7 +123,7 @@ public class ArvoreExpressoes {
 						variaveis.adicionar(raiz.getElemento().charAt(0) + "");
 						System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
 						Scanner sc = new Scanner(System.in);
-						BigDecimal tmp = new BigDecimal(sc.nextInt());
+						BigDecimal tmp = new BigDecimal(sc.nextLine());
 						valoresCorrespondentes.adicionar(tmp);
 						return tmp;
 					}
@@ -130,7 +134,7 @@ public class ArvoreExpressoes {
 			case "*":
 				return auxCalcularExpressao(raiz.getLeftNode(),variaveis,valoresCorrespondentes).multiply(auxCalcularExpressao(raiz.getRightNode(),variaveis,valoresCorrespondentes));
 			case "/":
-				return auxCalcularExpressao(raiz.getLeftNode(),variaveis,valoresCorrespondentes).divide(auxCalcularExpressao(raiz.getRightNode(),variaveis,valoresCorrespondentes),15,BigDecimal.ROUND_FLOOR);
+				return auxCalcularExpressao(raiz.getLeftNode(),variaveis,valoresCorrespondentes).divide(auxCalcularExpressao(raiz.getRightNode(),variaveis,valoresCorrespondentes));
 			case "-":
 				return auxCalcularExpressao(raiz.getLeftNode(),variaveis,valoresCorrespondentes).subtract(auxCalcularExpressao(raiz.getRightNode(),variaveis,valoresCorrespondentes));
 			case "+":
