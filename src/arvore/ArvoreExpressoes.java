@@ -19,6 +19,7 @@ public class ArvoreExpressoes {
 		}
 	}
 	public void armazeneExpressao(String expressao) {
+		root = null;
 		String Operadores = "+-*/", valor;
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
