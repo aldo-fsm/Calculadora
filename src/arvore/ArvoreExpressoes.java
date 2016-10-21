@@ -24,7 +24,9 @@ public class ArvoreExpressoes {
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
 		for (int i = 0; i < expressao.length(); i++) {
 			valor = "";
-			if (expressao.charAt(i) == ("(").charAt(0) && Operadores.indexOf(expressao.charAt(i)) == -1) {
+			//caso parenteses abrindo
+			if (expressao.charAt(i) == ("(").charAt(0)) {
+				System.out.println(i);
 				while (Operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != (")").charAt(0)) {
 					if (expressao.charAt(i) == ("(").charAt(0)) {
 						i++;
@@ -33,14 +35,20 @@ public class ArvoreExpressoes {
 					valor = valor + expressao.charAt(i);
 					i++;
 				}
+				Node<String> nodeAux = new Node<String>();
+				nodeAux.setElemento(valor);
+				pilhaArvores.push(nodeAux);
 				if(expressao.charAt(i) == (")").charAt(0)){
 					continue;
 				}
-				Node<String> nodeAux = new Node<String>();
-				nodeAux.setElemento(valor);
-				pilhaArvores.push(nodeAux);
 				pilhaOperadores.push(expressao.charAt(i) + "");
-			} else if (expressao.charAt(i) != (")").charAt(0) && Operadores.indexOf(expressao.charAt(i)) == -1) {
+			} 
+			//caso seja um operador
+			else if(Operadores.indexOf(expressao.charAt(i)) != -1){
+				pilhaOperadores.push(expressao.charAt(i) + "");
+			}
+			//caso seja um valor
+			else if (expressao.charAt(i) != (")").charAt(0)) {
 				valor = "";
 				while (expressao.charAt(i) != (")").charAt(0)) {
 					valor = valor + expressao.charAt(i);
@@ -50,32 +58,18 @@ public class ArvoreExpressoes {
 				Node<String> nodeAux = new Node<String>();
 				nodeAux.setElemento(valor);
 				pilhaArvores.push(nodeAux);
-			} else if(Operadores.indexOf(expressao.charAt(i)) != -1){
-				pilhaOperadores.push(expressao.charAt(i) + "");
-				i++;
-				valor = "";
-				while (expressao.charAt(i) != (")").charAt(0)) {
-					valor = valor + expressao.charAt(i);
-					i++;
-				}
-				i--;
-				Node<String> novoElemento = new Node<String>();
-				novoElemento.setElemento(valor);
-				pilhaArvores.push(novoElemento);
-			}else{
+			}
+			//caso seja um parenteses fechando
+			else{
 				Node<String> novoElemento = new Node<String>();
 				novoElemento.setElemento(pilhaOperadores.pop());
-				if(expressao.length() > i+1){
-					novoElemento.setRightNode(pilhaArvores.pop());
-					novoElemento.setLeftNode(pilhaArvores.pop());
-					pilhaArvores.push(novoElemento);
-				}else{
-					realocarNode(novoElemento);
-					realocarNode(pilhaArvores.pop());
-					realocarNode(pilhaArvores.pop());
-				}
+				novoElemento.setRightNode(pilhaArvores.pop());
+				novoElemento.setLeftNode(pilhaArvores.pop());
+				pilhaArvores.push(novoElemento);
 			}
 		}
+		Node<String> novoElemento = new Node<String>();
+		realocarNode(pilhaArvores.pop());
 	}
 
 	public void expressaoArmazenada() {
