@@ -30,7 +30,6 @@ public class ArvoreExpressoes {
 			valor = "";
 			//caso parenteses abrindo
 			if (expressao.charAt(i) == ("(").charAt(0)) {
-				System.out.println(i);
 				while (Operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != (")").charAt(0)) {
 					if(expressao.charAt(i) == (" ").charAt(0)){
 						i++;
