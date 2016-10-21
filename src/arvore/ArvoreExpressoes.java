@@ -23,11 +23,18 @@ public class ArvoreExpressoes {
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
 		for (int i = 0; i < expressao.length(); i++) {
+			if(expressao.charAt(i) == (" ").charAt(0)){
+				continue;
+			}
 			valor = "";
 			//caso parenteses abrindo
 			if (expressao.charAt(i) == ("(").charAt(0)) {
 				System.out.println(i);
 				while (Operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != (")").charAt(0)) {
+					if(expressao.charAt(i) == (" ").charAt(0)){
+						i++;
+						continue;
+					}
 					if (expressao.charAt(i) == ("(").charAt(0)) {
 						i++;
 						continue;
@@ -51,6 +58,10 @@ public class ArvoreExpressoes {
 			else if (expressao.charAt(i) != (")").charAt(0)) {
 				valor = "";
 				while (expressao.charAt(i) != (")").charAt(0)) {
+					if(expressao.charAt(i) == (" ").charAt(0)){
+						i++;
+						continue;
+					}
 					valor = valor + expressao.charAt(i);
 					i++;
 				}
