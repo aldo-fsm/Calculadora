@@ -162,7 +162,7 @@ public class ArvoreExpressoes {
 					retornoDecimal = retornoDecimal.pow(numerosAposVirgula.intValue());
 				}
 				
-				retorno = retorno.add(raiz(retornoDecimal, valorRaiz, 20));
+				retorno = retorno.multiply(raiz(retornoDecimal, valorRaiz, 20));
 				return retorno;
 			}
 		}
