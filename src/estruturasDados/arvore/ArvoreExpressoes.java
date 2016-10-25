@@ -37,7 +37,7 @@ public class ArvoreExpressoes {
 		root = null;
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
-		String Operadores = "+-*/^", valor;
+		String Operadores = "+-*/^~", valor;
 		for (int i = 0; i < expressao.length(); i++) {
 			if(expressao.charAt(i) == ' '){
 				continue;
@@ -127,9 +127,9 @@ public class ArvoreExpressoes {
 					if(variaveis.contem(raiz.getElemento().charAt(0)+"")){
 						return valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0)+""));
 					}else{
+						Scanner sc = new Scanner(System.in);
 						variaveis.adicionar(raiz.getElemento().charAt(0) + "");
 						System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
-						Scanner sc = new Scanner(System.in);
 						BigDecimal tmp = new BigDecimal(sc.nextLine());
 						valoresCorrespondentes.adicionar(tmp);
 						return tmp;
@@ -161,9 +161,10 @@ public class ArvoreExpressoes {
 					retornoDecimal = auxCalcularExpressao(raiz.getLeftNode(),variaveis,valoresCorrespondentes);
 					retornoDecimal = retornoDecimal.pow(numerosAposVirgula.intValue());
 				}
-				
-				retorno = retorno.multiply(raiz(retornoDecimal, valorRaiz, 20));
+				retorno = retorno.multiply(raiz(retornoDecimal, valorRaiz, 40));
 				return retorno;
+			case "~":
+				return raiz(expressao1,expressao2.intValue(),40);
 			}
 		}
 		return BigDecimal.ZERO;
