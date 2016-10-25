@@ -2,9 +2,10 @@ package testes;
 
 import java.util.Scanner;
 
-import calculadora.CalculadoraPosfixa;
 
+import calculadora.CalculadoraPosfixa;
 public class TesteCalculadoraPosFixa {
+	/*
 
 	public static void main(String[] args) {
 
@@ -29,5 +30,5 @@ public class TesteCalculadoraPosFixa {
 		}
 
 	}
-
+*/
 }

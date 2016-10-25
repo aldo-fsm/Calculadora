@@ -1,11 +1,11 @@
-package arvore;
+package estruturasDados.arvore;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Scanner;
 
-import lista.ListaArray;
-import pilha.pilhaArray;
+import estruturasDados.lista.ListaArray;
+import estruturasDados.pilha.pilhaArray;
 
 public class ArvoreExpressoes {
 	private Node<String> root;

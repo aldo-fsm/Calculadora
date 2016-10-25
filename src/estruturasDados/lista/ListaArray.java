@@ -1,4 +1,4 @@
- package lista;
+ package estruturasDados.lista;
 
 public class ListaArray <T>{
 	private Object[] elementos;

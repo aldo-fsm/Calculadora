@@ -1,4 +1,4 @@
-package pilha;
+package estruturasDados.pilha;
 
 public class pilhaArray<T> {
 	private Object[] elementos;

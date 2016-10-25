@@ -1,21 +1,18 @@
 package calculadora;
 
-import estruturasDados.PilhaArray;
-import estruturasDados.PilhaVaziaException;
-import estruturasDados.tads.Pilha;
 
 public class CalculadoraPosfixa {
-
+/*
 	private String[] operadores = { "+", "-", "*", "/", "^", "!" };
 	private Pilha<Double> pilha = new PilhaArray<Double>();
 
-	/**
+	*//**
 	 * Calcula uma expressão escrita em notação pos-fixa.
 	 * 
 	 * @param expressao
 	 *            expressão a ser calculada.
 	 * @return resultado da expressão.
-	 */
+	 *//*
 	public Double calcular(String expressao) {
 		String[] termos = expressao.split(" ");
 		for (String termo : termos) {
@@ -83,5 +80,5 @@ public class CalculadoraPosfixa {
 			return null;
 		}
 	}
-
+*/
 }

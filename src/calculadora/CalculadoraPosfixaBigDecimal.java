@@ -1,27 +1,18 @@
 package calculadora;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
-import java.math.RoundingMode;
-
-import estruturasDados.PilhaArray;
-import estruturasDados.PilhaVaziaException;
-import estruturasDados.tads.Pilha;
-
 public class CalculadoraPosfixaBigDecimal {
-
+/*
 	private String[] operadores = { "+", "-", "*", "/", "^", "!" };
 	private Pilha<BigDecimal> pilha = new PilhaArray<BigDecimal>();
 	private MathContext mathContext = new MathContext(7, RoundingMode.HALF_EVEN);
 
-	/**
+	*//**
 	 * Calcula uma expressão escrita em notação pos-fixa.
 	 * 
 	 * @param expressao
 	 *            expressão a ser calculada.
 	 * @return resultado da expressão.
-	 */
+	 *//*
 	public BigDecimal calcular(String expressao) {
 		String[] termos = expressao.split(" ");
 		for (String termo : termos) {
@@ -106,14 +97,14 @@ public class CalculadoraPosfixaBigDecimal {
 		}
 	}
 
-	/**
+	*//**
 	 * Determina a precisão dos calculos.
 	 * 
 	 * @param precision
 	 *            Numero de casas decimais para numeros sem representação exata.
-	 */
+	 *//*
 	public void setPrecision(int precision) {
 		mathContext = new MathContext(precision, RoundingMode.HALF_EVEN);
 	}
 
-}
+*/}

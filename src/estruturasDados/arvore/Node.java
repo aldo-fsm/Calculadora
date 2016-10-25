@@ -1,4 +1,4 @@
-package arvore;
+package estruturasDados.arvore;
 
 public class Node<T> {
 	

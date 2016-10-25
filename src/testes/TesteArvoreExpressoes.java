@@ -1,6 +1,8 @@
-package arvore;
+package testes;
 
-public class teste {
+import estruturasDados.arvore.ArvoreExpressoes;
+
+public class TesteArvoreExpressoes {
 	public static void main(String[] args) {
 		ArvoreExpressoes a = new ArvoreExpressoes();
 		a.armazeneExpressao("(2^3)");
