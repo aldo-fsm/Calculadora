@@ -156,7 +156,7 @@ public class ArvoreExpressoes {
 					valorRaiz = valorRaiz*10;
 					numerosAposVirgula = numerosAposVirgula.multiply(BigDecimal.TEN);
 				}
-				BigDecimal retornoDecimal = BigDecimal.ZERO;
+				BigDecimal retornoDecimal = BigDecimal.ONE;
 				if(numerosAposVirgula.intValue()!=0){
 					retornoDecimal = auxCalcularExpressao(raiz.getLeftNode(),variaveis,valoresCorrespondentes);
 					retornoDecimal = retornoDecimal.pow(numerosAposVirgula.intValue());
