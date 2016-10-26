@@ -16,8 +16,20 @@ public class ArvoreExpressoes {
 	}
 	
 	public void armazeneExpressao(String expressao) {
-		if(expressao.charAt(0)!='('){
+		int i = 0;
+		boolean precisaAesquerda = false;
+		boolean precisaAdireita = false;
+		while(expressao.charAt(i) == ' ') i++;
+		if(expressao.charAt(i) != '(') precisaAesquerda = true;
+		i = expressao.length()-1;
+		while(expressao.charAt(i) == ' ') i--;
+		if(expressao.charAt(i) != '(') precisaAesquerda = true;
+		if(expressao.charAt(0) != '(' && expressao.charAt(expressao.length()-1) != ')' || precisaAdireita&&precisaAesquerda){
 			tradutorDeExpressoes("(" + expressao + ")");
+		}else if(expressao.charAt(0) != '(' && expressao.charAt(expressao.length()-1) == ')'|| precisaAesquerda){
+			tradutorDeExpressoes("(" + expressao);
+		}else if(expressao.charAt(0) == '(' && expressao.charAt(expressao.length()-1) != ')'|| precisaAesquerda){
+			tradutorDeExpressoes(expressao + ")");
 		}else{
 			tradutorDeExpressoes(expressao);
 		}
