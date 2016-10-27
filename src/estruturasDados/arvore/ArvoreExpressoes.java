@@ -187,8 +187,8 @@ public class ArvoreExpressoes {
 				if (numerosAposVirgula.intValue() != 0) {
 					retornoDecimal = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
 					retornoDecimal = retornoDecimal.pow(numerosAposVirgula.intValue());
+					retorno = retorno.multiply(raiz(retornoDecimal, valorRaiz));
 				}
-				retorno = retorno.multiply(raiz(retornoDecimal, valorRaiz));
 				return retorno;
 			case "~":
 				return raiz(expressao1, expressao2.intValue());
