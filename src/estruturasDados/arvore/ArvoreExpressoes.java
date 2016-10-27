@@ -223,10 +223,10 @@ public class ArvoreExpressoes {
 
 	}
 
-	/* antigo
-	 * private BigDecimal raiz(BigDecimal valor, int indice, int iteracoes) {
-	 * BigDecimal resultado = BigDecimal.ONE; for (int i = 0; i < iteracoes;
-	 * i++) { resultado =
+	/*
+	 * antigo private BigDecimal raiz(BigDecimal valor, int indice, int
+	 * iteracoes) { BigDecimal resultado = BigDecimal.ONE; for (int i = 0; i <
+	 * iteracoes; i++) { resultado =
 	 * resultado.subtract(resultado.pow(indice).subtract(valor)
 	 * .divide(resultado.pow(indice - 1).multiply(BigDecimal.valueOf(indice)),
 	 * mathContext)); } return resultado; }
@@ -243,6 +243,7 @@ public class ArvoreExpressoes {
 					resultado.multiply(BigDecimal.valueOf(k2)).add(valor.divide(resultado.pow(k2), mathContext)));
 			if ((resultado.subtract(auxResultado)).abs().compareTo(erroMaximo) < 0)
 				break;
+			resultado = resultado.setScale(mathContext.getPrecision() + 5, mathContext.getRoundingMode());
 			auxResultado = resultado;
 		}
 		resultado = resultado.setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
