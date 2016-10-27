@@ -23,6 +23,7 @@ public class TesteCalculoExpressoes {
 			}
 			try {
 				calculadora.armazeneExpressao(input);
+				calculadora.informarVariaveis();
 				System.out.println(calculadora.expressaoEmOrdem() + " = " + calculadora.calcularExpressao());
 			} catch (RuntimeException e) {
 				e.printStackTrace(System.out);
