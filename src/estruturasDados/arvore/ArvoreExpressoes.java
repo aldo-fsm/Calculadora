@@ -223,30 +223,29 @@ public class ArvoreExpressoes {
 
 	}
 
-	/*
-	 * antigo private BigDecimal raiz(BigDecimal valor, int indice, int
-	 * iteracoes) { BigDecimal resultado = BigDecimal.ONE; for (int i = 0; i <
-	 * iteracoes; i++) { resultado =
+	/* antigo
+	 * private BigDecimal raiz(BigDecimal valor, int indice, int iteracoes) {
+	 * BigDecimal resultado = BigDecimal.ONE; for (int i = 0; i < iteracoes;
+	 * i++) { resultado =
 	 * resultado.subtract(resultado.pow(indice).subtract(valor)
 	 * .divide(resultado.pow(indice - 1).multiply(BigDecimal.valueOf(indice)),
 	 * mathContext)); } return resultado; }
 	 */
-	// novo
+
 	private BigDecimal raiz(BigDecimal valor, int indice) {
 		BigDecimal resultado = BigDecimal.ONE;
 		BigDecimal auxResultado = resultado;
 		BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), mathContext);
 		int k2 = indice - 1;
+		BigDecimal erroMaximo = BigDecimal.TEN.pow(-mathContext.getPrecision(), mathContext);
 		while (true) {
 			resultado = k1.multiply(
 					resultado.multiply(BigDecimal.valueOf(k2)).add(valor.divide(resultado.pow(k2), mathContext)));
-			resultado = resultado.setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
-			auxResultado = auxResultado.setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
-			if (resultado.equals(auxResultado))
+			if ((resultado.subtract(auxResultado)).abs().compareTo(erroMaximo) < 0)
 				break;
 			auxResultado = resultado;
 		}
+		resultado = resultado.setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
 		return resultado;
-
 	}
 }
