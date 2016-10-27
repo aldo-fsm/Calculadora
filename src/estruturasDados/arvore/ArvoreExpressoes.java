@@ -39,6 +39,12 @@ public class ArvoreExpressoes {
 		return auxExpressaoEmOrdem(root);
 	}
 	
+	public void informarVariaveis() {
+		ListaArray<String> variaveis = new ListaArray<String>();
+		ListaArray<String> valoresCorrespondentes = new ListaArray<String>();
+		auxInformaVariaveis(root, variaveis, valoresCorrespondentes);
+	}
+	
 	public BigDecimal calcularExpressao() {
 		ListaArray<String> variaveis = new ListaArray<String>(); 
 		ListaArray<BigDecimal> valoresCorrespondentes = new ListaArray<BigDecimal>();
@@ -180,6 +186,31 @@ public class ArvoreExpressoes {
 			}
 		}
 		return BigDecimal.ZERO;
+	}
+	
+	private void auxInformaVariaveis(Node<String> raiz, ListaArray<String> variaveis,
+			ListaArray<String> valoresCorrespondentes) {
+		if (raiz != null) {
+			auxInformaVariaveis(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
+			if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
+				String numeros = "0123456789";
+				if (numeros.indexOf(raiz.getElemento().charAt(0)) == -1) {
+					if (variaveis.contem(raiz.getElemento().charAt(0) + "")) {
+						raiz.setElemento(
+								valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + "")));
+					} else {
+						Scanner sc = new Scanner(System.in);
+						variaveis.adicionar(raiz.getElemento().charAt(0) + "");
+						System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
+						valoresCorrespondentes.adicionar(sc.nextLine());
+						raiz.setElemento(
+								valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + "")));
+					}
+				}
+			}
+			auxInformaVariaveis(raiz.getRightNode(), variaveis, valoresCorrespondentes);
+		}
+
 	}
 	
 	private BigDecimal raiz(BigDecimal valor,int indice,int iteracoes){
