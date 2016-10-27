@@ -158,7 +158,6 @@ public class ArvoreExpressoes {
 						System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
 						BigDecimal tmp = new BigDecimal(sc.nextLine());
 						valoresCorrespondentes.adicionar(tmp);
-						sc.close();
 						return tmp;
 					}
 				}
@@ -214,7 +213,6 @@ public class ArvoreExpressoes {
 						valoresCorrespondentes.adicionar(sc.nextLine());
 						raiz.setElemento(
 								valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + "")));
-						sc.close();
 					}
 				}
 			}
