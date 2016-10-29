@@ -11,6 +11,7 @@ import estruturasDados.pilha.pilhaArray;
 public class ArvoreExpressoes {
 	private Node<String> root;
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
+	private static final String operadores = "+-*/^~";
 
 	public void acrescentaNaExpressao(String expressao) {
 		tradutorDeExpressoes("(" + expressaoEmOrdem() + expressao + ")");
@@ -61,15 +62,14 @@ public class ArvoreExpressoes {
 		root = null;
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
-		String Operadores = "+-*/^~", valor;
+		String valor;
 		for (int i = 0; i < expressao.length(); i++) {
-			if (expressao.charAt(i) == ' ') {
+			if (expressao.charAt(i) == ' ')
 				continue;
-			}
 			valor = "";
 			// caso parenteses abrindo
 			if (expressao.charAt(i) == '(') {
-				while (Operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != (")").charAt(0)) {
+				while (operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != (")").charAt(0)) {
 					if (expressao.charAt(i) == ' ') {
 						i++;
 						continue;
@@ -90,7 +90,7 @@ public class ArvoreExpressoes {
 				pilhaOperadores.push(expressao.charAt(i) + "");
 			}
 			// caso seja um operador
-			else if (Operadores.indexOf(expressao.charAt(i)) != -1) {
+			else if (operadores.indexOf(expressao.charAt(i)) != -1) {
 				pilhaOperadores.push(expressao.charAt(i) + "");
 			}
 			// caso seja um valor
@@ -220,7 +220,8 @@ public class ArvoreExpressoes {
 		}
 
 	}
-	public void setPrecision(int precision){
+
+	public void setPrecision(int precision) {
 		mathContext = new MathContext(precision, mathContext.getRoundingMode());
 	}
 
