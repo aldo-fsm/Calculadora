@@ -69,7 +69,7 @@ public class ArvoreExpressoes {
 			valor = "";
 			// caso parenteses abrindo
 			if (expressao.charAt(i) == '(') {
-				while (operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != (")").charAt(0)) {
+				while (operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != ')') {
 					if (expressao.charAt(i) == ' ') {
 						i++;
 						continue;
