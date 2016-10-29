@@ -16,7 +16,7 @@ public class ArvoreExpressoes {
 		tradutorDeExpressoes("(" + expressaoEmOrdem() + expressao + ")");
 	}
 
-	public void armazeneExpressao(String expressao) {
+	public void armazenarExpressao(String expressao) {
 		int i = 0;
 		boolean precisaAesquerda = false;
 		boolean precisaAdireita = false;
@@ -220,31 +220,44 @@ public class ArvoreExpressoes {
 		}
 
 	}
-
-	/*
-	 * antigo private BigDecimal raiz(BigDecimal valor, int indice, int
-	 * iteracoes) { BigDecimal resultado = BigDecimal.ONE; for (int i = 0; i <
-	 * iteracoes; i++) { resultado =
-	 * resultado.subtract(resultado.pow(indice).subtract(valor)
-	 * .divide(resultado.pow(indice - 1).multiply(BigDecimal.valueOf(indice)),
-	 * mathContext)); } return resultado; }
-	 */
+	public void setPrecision(int precision){
+		mathContext = new MathContext(precision, mathContext.getRoundingMode());
+	}
 
 	private BigDecimal raiz(BigDecimal valor, int indice) {
+
 		BigDecimal resultado = BigDecimal.ONE;
 		BigDecimal auxResultado = resultado;
+
 		BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), mathContext);
 		int k2 = indice - 1;
-		BigDecimal erroMaximo = BigDecimal.TEN.pow(-mathContext.getPrecision(), mathContext);
+
+		int lastCorrectDigit = -1;
+
 		while (true) {
 			resultado = k1.multiply(
 					resultado.multiply(BigDecimal.valueOf(k2)).add(valor.divide(resultado.pow(k2), mathContext)));
-			if ((resultado.subtract(auxResultado)).abs().compareTo(erroMaximo) < 0)
-				break;
-			resultado = resultado.setScale(mathContext.getPrecision() + 5, mathContext.getRoundingMode());
+
+			lastCorrectDigit = firstDifferentDigit(resultado, auxResultado);
+			resultado = resultado.setScale(lastCorrectDigit, RoundingMode.DOWN);
 			auxResultado = resultado;
+
+			if (lastCorrectDigit >= mathContext.getPrecision()) {
+				break;
+			}
 		}
-		resultado = resultado.setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
-		return resultado;
+		return resultado.setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
+	}
+
+	private int firstDifferentDigit(BigDecimal a, BigDecimal b) {
+		String strA = a.toString();
+		String strB = b.toString();
+		int i = 0;
+		while (i < strA.length() && i < strB.length()) {
+			if (strA.charAt(i) != strB.charAt(i))
+				break;
+			i++;
+		}
+		return i;
 	}
 }

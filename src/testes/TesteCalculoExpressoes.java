@@ -22,7 +22,7 @@ public class TesteCalculoExpressoes {
 				break;
 			}
 			try {
-				calculadora.armazeneExpressao(input);
+				calculadora.armazenarExpressao(input);
 				calculadora.informarVariaveis();
 				System.out.println(calculadora.expressaoEmOrdem() + " = " + calculadora.calcularExpressao());
 			} catch (RuntimeException e) {

@@ -1,11 +1,14 @@
 package testes;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import estruturasDados.arvore.ArvoreExpressoes;
 
 public class TesteArvoreExpressoes {
 	public static void main(String[] args) {
 		ArvoreExpressoes a = new ArvoreExpressoes();
-		a.armazeneExpressao("(2 ~ 1000)");
+		a.armazenarExpressao("(2 ~ 10000)");
 		/*
 		 * obs metodo de newton se demonstra impreciso com raizes como a acima,
 		 * ou em casos de expoentes de mais de 3 casas decimais alem de
