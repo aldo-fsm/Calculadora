@@ -1,7 +1,5 @@
 package testes;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import estruturasDados.arvore.ArvoreExpressoes;
 

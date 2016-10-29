@@ -118,7 +118,6 @@ public class ArvoreExpressoes {
 				pilhaArvores.push(novoElemento);
 			}
 		}
-		Node<String> novoElemento = new Node<String>();
 		adicionarNode(pilhaArvores.pop());
 	}
 
@@ -226,28 +225,28 @@ public class ArvoreExpressoes {
 	}
 
 	private BigDecimal raiz(BigDecimal valor, int indice) {
+		MathContext tempMathContext = new MathContext(mathContext.getPrecision() + 5, mathContext.getRoundingMode());
 
 		BigDecimal resultado = BigDecimal.ONE;
 		BigDecimal auxResultado = resultado;
 
-		BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), mathContext);
+		BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), tempMathContext);
 		int k2 = indice - 1;
 
 		int lastCorrectDigit = -1;
 
 		while (true) {
 			resultado = k1.multiply(
-					resultado.multiply(BigDecimal.valueOf(k2)).add(valor.divide(resultado.pow(k2), mathContext)));
+					resultado.multiply(BigDecimal.valueOf(k2)).add(valor.divide(resultado.pow(k2), tempMathContext)));
 
 			lastCorrectDigit = firstDifferentDigit(resultado, auxResultado);
-			resultado = resultado.setScale(lastCorrectDigit, RoundingMode.DOWN);
 			auxResultado = resultado;
 
 			if (lastCorrectDigit >= mathContext.getPrecision()) {
 				break;
 			}
 		}
-		return resultado.setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
+		return resultado.setScale(mathContext.getPrecision(), mathContext.getRoundingMode()).stripTrailingZeros();
 	}
 
 	private int firstDifferentDigit(BigDecimal a, BigDecimal b) {
