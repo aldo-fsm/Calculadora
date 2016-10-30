@@ -125,6 +125,15 @@ public class ArvoreExpressoes {
 
 	private void tradutorDeExpressoes(String expressao) {
 		root = null;
+		if(expressao.length() <3){
+			root = new Node<String>();
+			if(expressao.length() == 1){
+				root.setElemento(expressao);
+			}else{
+				root.setElemento(expressao.charAt(1)+"");
+			}
+			return;
+		}
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
 		String valor;
