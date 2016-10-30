@@ -299,6 +299,9 @@ public class ArvoreExpressoes {
 	}
 
 	private BigDecimal raiz(BigDecimal valor, int indice) {
+		if (valor.intValue() < 0 && indice % 2 == 0) {
+			throw new ArithmeticException("raiz par de numero negativo");
+		}
 		MathContext tempMathContext = new MathContext(mathContext.getPrecision() + 5, mathContext.getRoundingMode());
 
 		BigDecimal resultado = BigDecimal.ONE;
