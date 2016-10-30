@@ -19,7 +19,8 @@ public class ArvoreExpressoes {
 														// precedencia
 
 	public void acrescentaNaExpressao(String expressao) {
-		tradutorDeExpressoes("(" + expressaoEmOrdem() + expressao + ")");
+		expressao = "(" + expressaoEmOrdem() + expressao + ")";
+		armazenarExpressao(expressao);
 	}
 
 	public void armazenarExpressao(String expressao) {
