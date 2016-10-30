@@ -39,14 +39,19 @@ public class ArvoreExpressoes {
 				lista.add(expressao.charAt(i) + "");
 			} else {
 				String numero = "";
+				boolean variavelJaNomeada = false;
 				while (i < expressao.length()) {
 					if ("()".contains(expressao.charAt(i) + "") || operadores.contains(expressao.charAt(i) + "")) {
 						break;
 					}
-					numero += expressao.charAt(i);
+					if (!variavelJaNomeada) {
+						numero += expressao.charAt(i);
+					}
+					if (!"01234789".contains(expressao.charAt(i + 1) + "")) {
+						variavelJaNomeada = true;
+					}
 					i++;
 				}
-				lista.add(numero);
 				if (i < expressao.length())
 					lista.add(expressao.charAt(i) + "");
 			}
