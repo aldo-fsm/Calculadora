@@ -15,7 +15,8 @@ public class ArvoreExpressoes {
 	private Node<String> root;
 	private Scanner scanner;
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
-	private static final String operadores = "^~*%/-+"; // operadores em ordem de
+	private static final String operadores = "%^~*/-+"; // operadores em ordem
+														// de
 														// precedencia
 
 	public void acrescentaNaExpressao(String expressao) {
@@ -52,6 +53,7 @@ public class ArvoreExpressoes {
 					}
 					i++;
 				}
+				lista.add(numero);
 				if (i < expressao.length())
 					lista.add(expressao.charAt(i) + "");
 			}
@@ -94,13 +96,14 @@ public class ArvoreExpressoes {
 		pilhaArray<Character> pilha = new pilhaArray<Character>();
 		boolean expressaoInvalida = false;
 		try {
-			int j = 0;
+			int j = -4;
 			for (int i = 0; i < expressao.length(); i++) {
 				if (expressao.charAt(i) == '(') {
 					j = i;
 					pilha.push('(');
 				} else if (expressao.charAt(i) == ')') {
-					if(j >= i-3)expressaoInvalida = true;
+					if (j >= i - 3)
+						expressaoInvalida = true;
 					pilha.pop();
 				}
 			}
@@ -124,6 +127,8 @@ public class ArvoreExpressoes {
 	}
 
 	public BigDecimal calcularExpressao() {
+		if (root.getLeftNode() == null)
+			return new BigDecimal(root.getElemento());
 		ListaArray<String> variaveis = new ListaArray<String>();
 		ListaArray<BigDecimal> valoresCorrespondentes = new ListaArray<BigDecimal>();
 		return auxCalcularExpressao(root, variaveis, valoresCorrespondentes);
@@ -131,12 +136,12 @@ public class ArvoreExpressoes {
 
 	private void tradutorDeExpressoes(String expressao) {
 		root = null;
-		if(expressao.length() <3){
+		if (expressao.length() < 3) {
 			root = new Node<String>();
-			if(expressao.length() == 1){
+			if (expressao.length() == 1) {
 				root.setElemento(expressao);
-			}else{
-				root.setElemento(expressao.charAt(1)+"");
+			} else {
+				root.setElemento(expressao.charAt(1) + "");
 			}
 			return;
 		}
@@ -311,10 +316,8 @@ public class ArvoreExpressoes {
 			throw new ArithmeticException("raiz par de numero negativo");
 		}
 		MathContext tempMathContext = new MathContext(mathContext.getPrecision() + 5, mathContext.getRoundingMode());
-
 		BigDecimal resultado = BigDecimal.ONE;
 		BigDecimal auxResultado = resultado;
-
 		BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), tempMathContext);
 		int k2 = indice - 1;
 
@@ -346,3 +349,4 @@ public class ArvoreExpressoes {
 		return i;
 	}
 }
+
