@@ -89,10 +89,13 @@ public class ArvoreExpressoes {
 		boolean expressaoInvalida = false;
 		try {
 			for (int i = 0; i < expressao.length(); i++) {
-				if (expressao.charAt(i) == '(')
+				if (expressao.charAt(i) == '(') {
+					j = i;
 					pilha.push('(');
-				else if (expressao.charAt(i) == ')')
+				} else if (expressao.charAt(i) == ')') {
+					if(j >= i-3)expressaoInvalida = true;
 					pilha.pop();
+				}
 			}
 			if (!pilha.isEmpty())
 				expressaoInvalida = true;
