@@ -94,6 +94,7 @@ public class ArvoreExpressoes {
 		pilhaArray<Character> pilha = new pilhaArray<Character>();
 		boolean expressaoInvalida = false;
 		try {
+			int j = 0;
 			for (int i = 0; i < expressao.length(); i++) {
 				if (expressao.charAt(i) == '(') {
 					j = i;
