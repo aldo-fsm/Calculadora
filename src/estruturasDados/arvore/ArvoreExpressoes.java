@@ -15,7 +15,7 @@ public class ArvoreExpressoes {
 	private Node<String> root;
 	private Scanner scanner;
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
-	private static final String operadores = "^~*/-+"; // operadores em ordem de
+	private static final String operadores = "^~*%/-+"; // operadores em ordem de
 														// precedencia
 
 	public void acrescentaNaExpressao(String expressao) {
@@ -269,6 +269,8 @@ public class ArvoreExpressoes {
 				return retorno;
 			case "~":
 				return raiz(expressao1, expressao2.intValue());
+			case "%":
+				return expressao1.remainder(expressao2);
 			}
 		}
 		return BigDecimal.ZERO;
