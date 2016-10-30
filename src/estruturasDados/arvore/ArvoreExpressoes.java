@@ -3,6 +3,9 @@ package estruturasDados.arvore;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import estruturasDados.lista.ListaArray;
@@ -10,36 +13,94 @@ import estruturasDados.pilha.pilhaArray;
 
 public class ArvoreExpressoes {
 	private Node<String> root;
+	private Scanner scanner;
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
-	private static final String operadores = "+-*/^~";
+	private static final String operadores = "^~*/-+"; // operadores em ordem de
+														// precedencia
 
 	public void acrescentaNaExpressao(String expressao) {
 		tradutorDeExpressoes("(" + expressaoEmOrdem() + expressao + ")");
 	}
 
 	public void armazenarExpressao(String expressao) {
-		int i = 0;
-		boolean precisaAesquerda = false;
-		boolean precisaAdireita = false;
-		while (expressao.charAt(i) == ' ')
-			i++;
-		if (expressao.charAt(i) != '(')
-			precisaAesquerda = true;
-		i = expressao.length() - 1;
-		while (expressao.charAt(i) == ' ')
-			i--;
-		if (expressao.charAt(i) != '(')
-			precisaAesquerda = true;
-		if (expressao.charAt(0) != '(' && expressao.charAt(expressao.length() - 1) != ')'
-				|| precisaAdireita && precisaAesquerda) {
-			tradutorDeExpressoes("(" + expressao + ")");
-		} else if (expressao.charAt(0) != '(' && expressao.charAt(expressao.length() - 1) == ')' || precisaAesquerda) {
-			tradutorDeExpressoes("(" + expressao);
-		} else if (expressao.charAt(0) == '(' && expressao.charAt(expressao.length() - 1) != ')' || precisaAesquerda) {
-			tradutorDeExpressoes(expressao + ")");
-		} else {
-			tradutorDeExpressoes(expressao);
+
+		validarExpressao(expressao);
+
+		ArrayList<String> lista = new ArrayList<String>();
+		expressao = "(" + expressao + ")";
+
+		for (int i = 0; i < expressao.length(); i++) {
+			if (expressao.charAt(i) == ' ') {
+				continue;
+			} else if ("()".contains(expressao.charAt(i) + "")) {
+				lista.add(expressao.charAt(i) + "");
+			} else if (operadores.contains(expressao.charAt(i) + "")) {
+				lista.add(expressao.charAt(i) + "");
+			} else {
+				String numero = "";
+				while (i < expressao.length()) {
+					if ("()".contains(expressao.charAt(i) + "") || operadores.contains(expressao.charAt(i) + "")) {
+						break;
+					}
+					numero += expressao.charAt(i);
+					i++;
+				}
+				lista.add(numero);
+				if (i < expressao.length())
+					lista.add(expressao.charAt(i) + "");
+			}
 		}
+		while (lista.size() > 1) {
+			int fim = lista.indexOf(")");
+			int inicio;
+			for (inicio = fim; inicio > 0; inicio--) {
+				if (lista.get(inicio).equals("("))
+					break;
+			}
+			lista.remove(inicio);
+			lista.remove(fim - 1);
+			adicionarParenteses(lista, inicio, fim - 1);
+		}
+		tradutorDeExpressoes(lista.get(0));
+	}
+
+	private void adicionarParenteses(List<String> expressao, int inicio, int fim) {
+		int i = 0;
+		while (i < operadores.length()) {
+			char operador = operadores.charAt(i);
+			List<String> subExpressao = expressao.subList(inicio, fim);
+			int index = inicio + subExpressao.indexOf(operador + "");
+			if (index > inicio && index < fim) {
+				String left = index > 0 ? expressao.get(index - 1) : "";
+				String right = index < expressao.size() ? expressao.get(index + 1) : "";
+				expressao.add(index, "(" + left + operador + right + ")");
+				expressao.remove(index + 2);
+				expressao.remove(index + 1);
+				expressao.remove(index - 1);
+				fim -= 2;
+			} else {
+				i++;
+			}
+		}
+	}
+
+	private void validarExpressao(String expressao) {
+		pilhaArray<Character> pilha = new pilhaArray<Character>();
+		boolean expressaoInvalida = false;
+		try {
+			for (int i = 0; i < expressao.length(); i++) {
+				if (expressao.charAt(i) == '(')
+					pilha.push('(');
+				else if (expressao.charAt(i) == ')')
+					pilha.pop();
+			}
+			if (!pilha.isEmpty())
+				expressaoInvalida = true;
+		} catch (RuntimeException e) {
+			expressaoInvalida = true;
+		}
+		if (expressaoInvalida)
+			throw new InvalidParameterException("Expressao mal formada");
 	}
 
 	public String expressaoEmOrdem() {
@@ -152,10 +213,10 @@ public class ArvoreExpressoes {
 					if (variaveis.contem(raiz.getElemento().charAt(0) + "")) {
 						return valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + ""));
 					} else {
-						Scanner sc = new Scanner(System.in);
+						scanner = new Scanner(System.in);
 						variaveis.adicionar(raiz.getElemento().charAt(0) + "");
 						System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
-						BigDecimal tmp = new BigDecimal(sc.nextLine());
+						BigDecimal tmp = new BigDecimal(scanner.nextLine());
 						valoresCorrespondentes.adicionar(tmp);
 						return tmp;
 					}
@@ -206,10 +267,10 @@ public class ArvoreExpressoes {
 						raiz.setElemento(
 								valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + "")));
 					} else {
-						Scanner sc = new Scanner(System.in);
+						scanner = new Scanner(System.in);
 						variaveis.adicionar(raiz.getElemento().charAt(0) + "");
 						System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
-						valoresCorrespondentes.adicionar(sc.nextLine());
+						valoresCorrespondentes.adicionar(scanner.nextLine());
 						raiz.setElemento(
 								valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + "")));
 					}

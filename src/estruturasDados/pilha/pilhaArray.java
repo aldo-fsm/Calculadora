@@ -19,7 +19,7 @@ public class pilhaArray<T> {
 	
 	public T pop(){
 		if(isEmpty()){
-			throw new NullPointerException("the pile is empty");
+			throw new NullPointerException("the stack is empty");
 		}else if(size() == 1){
 			T retorno = (T) elementos[size()-1];
 			makeEmpty();
