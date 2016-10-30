@@ -7,7 +7,7 @@ import estruturasDados.arvore.ArvoreExpressoes;
 public class TesteCalculoExpressoes {
 	public static void main(String[] args) {
 		ArvoreExpressoes calculadora = new ArvoreExpressoes();
-		System.out.println("\nTeste - Calculadora de ExpressÃµes");
+		System.out.println("\nTeste - Calculadora de Expressões\n");
 		System.out.println("digite exit para sair");
 		System.out.println("digite acrescentar para acrescentar a uma expressao previamente incluida\n\n");
 		String input = "";
@@ -16,14 +16,16 @@ public class TesteCalculoExpressoes {
 			try {
 				System.out.printf(">>> ");
 				input = s.nextLine();
-				if (input.equals("exit")) {
+				if (input.equals("")) {
+					continue;
+				} else if (input.equals("exit")) {
 					break;
 				} else if (input.equals("acrescentar")) {
 					System.out.println("digite a expressao a ser acrescentada sem parenteses");
 					System.out.printf(">>> ");
 					input = s.nextLine();
 					calculadora.acrescentaNaExpressao(input);
-				}else{
+				} else {
 					calculadora.armazenarExpressao(input);
 				}
 				calculadora.informarVariaveis();
