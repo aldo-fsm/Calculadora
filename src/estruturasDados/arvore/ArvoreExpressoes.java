@@ -105,7 +105,7 @@ public class ArvoreExpressoes {
 		boolean operadorJaPosto = false;
 		boolean apenasValor = true;
 		for (int contador = 0; contador < expressao.length(); contador++) {
-			if ("-0123456789".indexOf(expressao.charAt(contador)) != -1) {
+			if ("-0123456789.".indexOf(expressao.charAt(contador)) != -1) {
 				if (contador > 1 && expressao.charAt(contador) == '-') {
 					apenasValor = false;
 					break;
