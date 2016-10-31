@@ -106,15 +106,18 @@ public class ArvoreExpressoes {
 	private void validarExpressao(String expressao) {
 		pilhaArray<Character> pilha = new pilhaArray<Character>();
 		boolean expressaoInvalida = false;
+		int posicaoErro = -1;
 		try {
 			int j = -4;
 			for (int i = 0; i < expressao.length(); i++) {
+				posicaoErro = i;
 				if (expressao.charAt(i) == '(') {
 					j = i;
 					pilha.push('(');
 				} else if (expressao.charAt(i) == ')') {
-					if (j >= i - 3)
+					if (j >= i - 3) {
 						expressaoInvalida = true;
+					}
 					pilha.pop();
 				}
 			}
@@ -123,8 +126,16 @@ public class ArvoreExpressoes {
 		} catch (RuntimeException e) {
 			expressaoInvalida = true;
 		}
-		if (expressaoInvalida)
-			throw new InvalidParameterException("Expressao mal formada");
+		if (expressaoInvalida) {
+			String indicadorErro = "";
+			int procuraErro = 0;
+			while (procuraErro < posicaoErro) {
+				indicadorErro += " ";
+				procuraErro++;
+			}
+			indicadorErro += "^";
+			throw new InvalidParameterException("Expressao mal formada\n" + expressao + "\n" + indicadorErro);
+		}
 	}
 
 	public String expressaoEmOrdem() {
