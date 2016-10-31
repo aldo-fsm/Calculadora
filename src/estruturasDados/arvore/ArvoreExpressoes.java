@@ -131,10 +131,6 @@ public class ArvoreExpressoes {
 					}
 					if (expressao.charAt(i) == '(') {
 						i++;
-						if (expressao.charAt(i + 1) != '-') {
-							valor += expressao.charAt(i);
-							i++;
-						}
 						continue;
 					}
 					valor = valor + expressao.charAt(i);
