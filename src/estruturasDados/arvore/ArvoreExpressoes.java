@@ -16,7 +16,7 @@ public class ArvoreExpressoes {
 	private Scanner scanner;
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
 	// operadores em ordem de precedencia
-	private static final String operadores = "%^~*/-+"; 
+	private static final String operadores = "%^~*/-+";
 
 	public void acrescentaNaExpressao(String expressao) {
 		expressao = "(" + expressaoEmOrdem() + expressao + ")";
@@ -57,7 +57,7 @@ public class ArvoreExpressoes {
 					if (!variavelJaNomeada) {
 						numero += expressao.charAt(i);
 					}
-					if (!"01234789".contains(expressao.charAt(i + 1) + "")) {
+					if (!"0123456789".contains(expressao.charAt(i + 1) + "")) {
 						variavelJaNomeada = true;
 					}
 					i++;
@@ -101,18 +101,28 @@ public class ArvoreExpressoes {
 	}
 
 	private void tradutorDeExpressoes(String expressao) {
-		int nV = 0;
-		int nO = 0;
 		root = null;
+		boolean operadorJaPosto = false;
+		boolean apenasValor = true;
+		for (int contador = 0; contador < expressao.length(); contador++) {
+			if ("-0123456789".indexOf(expressao.charAt(contador)) != -1) {
+				if (contador > 1 && expressao.charAt(contador) == '-') {
+					apenasValor = false;
+					break;
+				}
+				apenasValor = true;
+			} else {
+				apenasValor = false;
+				break;
+			}
+		}
 		if (expressao.length() < 3) {
 			root = new Node<String>();
-			if (expressao.length() == 1) {
-				root.setElemento(expressao);
-			} else if (expressao.charAt(0) == '-') {
-				root.setElemento("-" + expressao.charAt(1) + "");
-			} else {
-				root.setElemento(expressao.charAt(1) + "");
-			}
+			root.setElemento(expressao);
+			return;
+		} else if (apenasValor) {
+			root = new Node<String>();
+			root.setElemento(expressao);
 			return;
 		}
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
@@ -124,12 +134,7 @@ public class ArvoreExpressoes {
 				continue;
 			// caso parenteses abrindo
 			if (expressao.charAt(i) == '(') {
-				if(expressao.charAt(i+1) == '-'){
-					i++;
-					valor += '-';
-				}
-				i++;
-				while (operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != ')') {
+				while (expressao.charAt(i) != ')') {
 					if (expressao.charAt(i) == ' ') {
 						i++;
 						continue;
@@ -138,48 +143,52 @@ public class ArvoreExpressoes {
 						i++;
 						continue;
 					}
+					if ((operadorJaPosto || valor == "") && expressao.charAt(i) == '-') {
+						valor += '-';
+						i++;
+						continue;
+					} else if (operadores.contains("" + expressao.charAt(i))) {
+						break;
+					}
 					valor = valor + expressao.charAt(i);
 					i++;
 				}
 				Node<String> nodeAux = new Node<String>();
 				nodeAux.setElemento(valor);
 				pilhaArvores.push(nodeAux);
-				nV++;
 				if (expressao.charAt(i) == ')') {
 					continue;
 				}
 				pilhaOperadores.push(expressao.charAt(i) + "");
-				nO++;
+				operadorJaPosto = true;
 			}
 			// caso seja um operador
 			else if (operadores.indexOf(expressao.charAt(i)) != -1) {
-				if (nV <= nO + 1) {
-					if (i > 0) {
-						if (operadores.contains(expressao.charAt(i - 1) + "") && expressao.charAt(i) == '-') {
-							valor += expressao.charAt(i++);
-							while (operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != ')') {
-								if (expressao.charAt(i) == ' ') {
-									i++;
-									continue;
-								}
-								if (expressao.charAt(i) == '(') {
-									i++;
-									continue;
-								}
-								valor = valor + expressao.charAt(i);
+				if (i > 0) {
+					if (operadorJaPosto && expressao.charAt(i) == '-') {
+						valor += expressao.charAt(i++);
+						while (operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != ')') {
+							if (expressao.charAt(i) == ' ') {
 								i++;
+								continue;
 							}
-							Node<String> nodeAux = new Node<String>();
-							nodeAux.setElemento(valor);
-							pilhaArvores.push(nodeAux);
-							nV++;
-							i--;
-							continue;
+							if (expressao.charAt(i) == '(') {
+								i++;
+								continue;
+							}
+							valor = valor + expressao.charAt(i);
+							i++;
 						}
+						Node<String> nodeAux = new Node<String>();
+						nodeAux.setElemento(valor);
+						pilhaArvores.push(nodeAux);
+						operadorJaPosto = false;
+						i--;
+						continue;
 					}
 				}
 				pilhaOperadores.push(expressao.charAt(i) + "");
-				nO++;
+				operadorJaPosto = true;
 			}
 			// caso seja um valor
 			else if (expressao.charAt(i) != ')') {
@@ -196,7 +205,7 @@ public class ArvoreExpressoes {
 				Node<String> nodeAux = new Node<String>();
 				nodeAux.setElemento(valor);
 				pilhaArvores.push(nodeAux);
-				nV++;
+				operadorJaPosto = false;
 			}
 			// caso seja um parenteses fechando
 			else {
@@ -229,7 +238,7 @@ public class ArvoreExpressoes {
 			}
 		}
 	}
-	
+
 	private String auxExpressaoEmOrdem(Node<String> node) {
 		if (node != null) {
 			if (node.getLeftNode() == null && node.getRightNode() == null) {
@@ -284,7 +293,7 @@ public class ArvoreExpressoes {
 				return expressao1.add(expressao2);
 			case "^":
 				boolean indiceNegativo = false;
-				if(expressao2.compareTo(BigDecimal.ZERO)<0) {
+				if (expressao2.compareTo(BigDecimal.ZERO) < 0) {
 					indiceNegativo = true;
 					expressao2 = BigDecimal.ZERO.subtract(expressao2);
 				}
@@ -301,11 +310,14 @@ public class ArvoreExpressoes {
 					retornoDecimal = retornoDecimal.pow(numerosAposVirgula.intValue());
 					retorno = retorno.multiply(raiz(retornoDecimal, valorRaiz));
 				}
-				if(indiceNegativo)return BigDecimal.ONE.divide(retorno);
+				if (indiceNegativo)
+					return BigDecimal.ONE.divide(retorno);
 				return retorno;
 			case "~":
-				
-				if(expressao2.intValue()<0)return BigDecimal.ONE.divide(raiz(expressao1, BigDecimal.ZERO.subtract(expressao2).intValue()),mathContext);
+
+				if (expressao2.intValue() < 0)
+					return BigDecimal.ONE.divide(raiz(expressao1, BigDecimal.ZERO.subtract(expressao2).intValue()),
+							mathContext);
 				return raiz(expressao1, expressao2.intValue());
 			case "%":
 				return expressao1.remainder(expressao2);
@@ -332,7 +344,7 @@ public class ArvoreExpressoes {
 					pilha.pop();
 				}
 			}
-			if (!pilha.isEmpty()){
+			if (!pilha.isEmpty()) {
 				posicaoErro = j;
 				expressaoInvalida = true;
 			}
@@ -350,7 +362,7 @@ public class ArvoreExpressoes {
 			throw new InvalidParameterException("Expressao mal formada\n" + expressao + "\n" + indicadorErro);
 		}
 	}
-	
+
 	private void auxInformaVariaveis(Node<String> raiz, ListaArray<String> variaveis,
 			ListaArray<String> valoresCorrespondentes) {
 		if (raiz != null) {
