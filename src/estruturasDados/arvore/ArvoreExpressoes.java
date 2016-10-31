@@ -30,16 +30,26 @@ public class ArvoreExpressoes {
 
 		ArrayList<String> lista = new ArrayList<String>();
 		expressao = "(" + expressao + ")";
-
+		int nV = 0;
+		int nO = 0;
 		for (int i = 0; i < expressao.length(); i++) {
 			if (expressao.charAt(i) == ' ') {
 				continue;
 			} else if ("()".contains(expressao.charAt(i) + "")) {
 				lista.add(expressao.charAt(i) + "");
-			} else if (operadores.contains(expressao.charAt(i) + "")) {
+			} else if (operadores.contains(expressao.charAt(i) + "") && nO + 1 < nV) {
 				lista.add(expressao.charAt(i) + "");
+				nO++;
 			} else {
 				String numero = "";
+				if (operadores.contains(expressao.charAt(i) + "") && expressao.charAt(i) != '-') {
+					lista.add(expressao.charAt(i) + "");
+					nO++;
+					continue;
+				} else {
+					numero += expressao.charAt(i);
+					i++;
+				}
 				boolean variavelJaNomeada = false;
 				while (i < expressao.length()) {
 					if ("()".contains(expressao.charAt(i) + "") || operadores.contains(expressao.charAt(i) + "")) {
@@ -56,6 +66,7 @@ public class ArvoreExpressoes {
 				lista.add(numero);
 				if (i < expressao.length())
 					lista.add(expressao.charAt(i) + "");
+				nV++;
 			}
 		}
 		while (lista.size() > 1) {
@@ -135,11 +146,15 @@ public class ArvoreExpressoes {
 	}
 
 	private void tradutorDeExpressoes(String expressao) {
+		int nV = 0;
+		int nO = 0;
 		root = null;
 		if (expressao.length() < 3) {
 			root = new Node<String>();
 			if (expressao.length() == 1) {
 				root.setElemento(expressao);
+			} else if (expressao.charAt(0) == '-') {
+				root.setElemento("-" + expressao.charAt(1) + "");
 			} else {
 				root.setElemento(expressao.charAt(1) + "");
 			}
@@ -149,9 +164,9 @@ public class ArvoreExpressoes {
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
 		String valor;
 		for (int i = 0; i < expressao.length(); i++) {
+			valor = "";
 			if (expressao.charAt(i) == ' ')
 				continue;
-			valor = "";
 			// caso parenteses abrindo
 			if (expressao.charAt(i) == '(') {
 				while (operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != ')') {
@@ -161,6 +176,10 @@ public class ArvoreExpressoes {
 					}
 					if (expressao.charAt(i) == '(') {
 						i++;
+						if(expressao.charAt(i+1) != '-'){
+							valor += expressao.charAt(i);
+							i++;
+						}
 						continue;
 					}
 					valor = valor + expressao.charAt(i);
@@ -169,14 +188,42 @@ public class ArvoreExpressoes {
 				Node<String> nodeAux = new Node<String>();
 				nodeAux.setElemento(valor);
 				pilhaArvores.push(nodeAux);
+				nV++;
 				if (expressao.charAt(i) == ')') {
 					continue;
 				}
 				pilhaOperadores.push(expressao.charAt(i) + "");
+				nO++;
 			}
 			// caso seja um operador
 			else if (operadores.indexOf(expressao.charAt(i)) != -1) {
+				if (nV <= nO + 1) {
+					if (i > 0) {
+						if (operadores.contains(expressao.charAt(i - 1) + "") && expressao.charAt(i) == '-') {
+							valor += expressao.charAt(i++);
+							while (operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != ')') {
+								if (expressao.charAt(i) == ' ') {
+									i++;
+									continue;
+								}
+								if (expressao.charAt(i) == '(') {
+									i++;
+									continue;
+								}
+								valor = valor + expressao.charAt(i);
+								i++;
+							}
+							Node<String> nodeAux = new Node<String>();
+							nodeAux.setElemento(valor);
+							pilhaArvores.push(nodeAux);
+							nV++;
+							i--;
+							continue;
+						}
+					}
+				}
 				pilhaOperadores.push(expressao.charAt(i) + "");
+				nO++;
 			}
 			// caso seja um valor
 			else if (expressao.charAt(i) != ')') {
@@ -193,6 +240,7 @@ public class ArvoreExpressoes {
 				Node<String> nodeAux = new Node<String>();
 				nodeAux.setElemento(valor);
 				pilhaArvores.push(nodeAux);
+				nV++;
 			}
 			// caso seja um parenteses fechando
 			else {
@@ -232,7 +280,7 @@ public class ArvoreExpressoes {
 			ListaArray<BigDecimal> valoresCorrespondentes) {
 		if (root != null) {
 			if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
-				String numeros = "0123456789";
+				String numeros = "-0123456789";
 				if (numeros.indexOf(raiz.getElemento().charAt(0)) == -1) {
 					if (variaveis.contem(raiz.getElemento().charAt(0) + "")) {
 						return valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + ""));
@@ -285,24 +333,26 @@ public class ArvoreExpressoes {
 	private void auxInformaVariaveis(Node<String> raiz, ListaArray<String> variaveis,
 			ListaArray<String> valoresCorrespondentes) {
 		if (raiz != null) {
-			auxInformaVariaveis(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
-			if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
-				String numeros = "0123456789";
-				if (numeros.indexOf(raiz.getElemento().charAt(0)) == -1) {
-					if (variaveis.contem(raiz.getElemento().charAt(0) + "")) {
-						raiz.setElemento(
-								valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + "")));
-					} else {
-						scanner = new Scanner(System.in);
-						variaveis.adicionar(raiz.getElemento().charAt(0) + "");
-						System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
-						valoresCorrespondentes.adicionar(scanner.nextLine());
-						raiz.setElemento(
-								valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + "")));
+			if (raiz.getElemento() != "") {
+				auxInformaVariaveis(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
+				if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
+					String numeros = "-0123456789";
+					if (numeros.indexOf(raiz.getElemento().charAt(0)) == -1) {
+						if (variaveis.contem(raiz.getElemento().charAt(0) + "")) {
+							raiz.setElemento(
+									valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + "")));
+						} else {
+							scanner = new Scanner(System.in);
+							variaveis.adicionar(raiz.getElemento().charAt(0) + "");
+							System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
+							valoresCorrespondentes.adicionar(scanner.nextLine());
+							raiz.setElemento(
+									valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + "")));
+						}
 					}
 				}
+				auxInformaVariaveis(raiz.getRightNode(), variaveis, valoresCorrespondentes);
 			}
-			auxInformaVariaveis(raiz.getRightNode(), variaveis, valoresCorrespondentes);
 		}
 
 	}
@@ -314,7 +364,7 @@ public class ArvoreExpressoes {
 	private BigDecimal raiz(BigDecimal valor, int indice) {
 		if (valor.intValue() < 0 && indice % 2 == 0) {
 			throw new ArithmeticException("raiz par de numero negativo");
-		}else if(indice == 1){
+		} else if (indice == 1) {
 			return valor;
 		}
 		int k2 = indice - 1;
@@ -325,13 +375,12 @@ public class ArvoreExpressoes {
 		BigDecimal resultado = BigDecimal.ONE;
 		BigDecimal auxResultado = resultado;
 		BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), tempMathContext);
-		int i= 0;
-		do{
+		do {
 			resultado = k1.multiply(
 					resultado.multiply(BigDecimal.valueOf(k2)).add(valor.divide(resultado.pow(k2), tempMathContext)));
 			lastCorrectDigit = firstDifferentDigit(resultado, auxResultado);
 			auxResultado = resultado;
-		}while(lastCorrectDigit < precisao);
+		} while (lastCorrectDigit < precisao);
 		return resultado.setScale(precisao, roundingMode).stripTrailingZeros();
 	}
 
@@ -347,4 +396,3 @@ public class ArvoreExpressoes {
 		return i;
 	}
 }
-
