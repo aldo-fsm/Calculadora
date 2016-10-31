@@ -121,8 +121,10 @@ public class ArvoreExpressoes {
 					pilha.pop();
 				}
 			}
-			if (!pilha.isEmpty())
+			if (!pilha.isEmpty()){
+				posicaoErro = j;
 				expressaoInvalida = true;
+			}
 		} catch (RuntimeException e) {
 			expressaoInvalida = true;
 		}
