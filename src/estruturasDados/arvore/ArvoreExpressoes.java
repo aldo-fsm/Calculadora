@@ -124,6 +124,11 @@ public class ArvoreExpressoes {
 				continue;
 			// caso parenteses abrindo
 			if (expressao.charAt(i) == '(') {
+				if(expressao.charAt(i+1) == '-'){
+					i++;
+					valor += '-';
+				}
+				i++;
 				while (operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != ')') {
 					if (expressao.charAt(i) == ' ') {
 						i++;
