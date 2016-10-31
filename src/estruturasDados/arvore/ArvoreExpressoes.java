@@ -29,21 +29,18 @@ public class ArvoreExpressoes {
 
 		ArrayList<String> lista = new ArrayList<String>();
 		expressao = "(" + expressao + ")";
-		int nV = 0;
-		int nO = 0;
+		boolean eSinal = false;
 		for (int i = 0; i < expressao.length(); i++) {
 			if (expressao.charAt(i) == ' ') {
 				continue;
 			} else if ("()".contains(expressao.charAt(i) + "")) {
 				lista.add(expressao.charAt(i) + "");
-			} else if (operadores.contains(expressao.charAt(i) + "") && nO + 2 < nV) {
-				lista.add(expressao.charAt(i) + "");
-				nO++;
-			} else {
+			}else {
 				String numero = "";
-				if (operadores.contains(expressao.charAt(i) + "") && expressao.charAt(i) != '-') {
+				if (operadores.contains(expressao.charAt(i) + "") && (expressao.charAt(i) != '-'&&!eSinal)) {
+					System.out.println(expressao.charAt(i)+"");
 					lista.add(expressao.charAt(i) + "");
-					nO++;
+					eSinal = false;
 					continue;
 				} else {
 					numero += expressao.charAt(i);
@@ -65,7 +62,7 @@ public class ArvoreExpressoes {
 				lista.add(numero);
 				if (i < expressao.length())
 					lista.add(expressao.charAt(i) + "");
-				nV++;
+				eSinal = true;
 			}
 		}
 		while (lista.size() > 1) {
