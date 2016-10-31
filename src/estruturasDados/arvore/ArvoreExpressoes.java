@@ -314,27 +314,25 @@ public class ArvoreExpressoes {
 	private BigDecimal raiz(BigDecimal valor, int indice) {
 		if (valor.intValue() < 0 && indice % 2 == 0) {
 			throw new ArithmeticException("raiz par de numero negativo");
+		}else if(indice == 1){
+			return valor;
 		}
-		MathContext tempMathContext = new MathContext(mathContext.getPrecision() + 5, mathContext.getRoundingMode());
+		int k2 = indice - 1;
+		int lastCorrectDigit = -1;
+		int precisao = mathContext.getPrecision();
+		RoundingMode roundingMode = mathContext.getRoundingMode();
+		MathContext tempMathContext = new MathContext(precisao + 5, roundingMode);
 		BigDecimal resultado = BigDecimal.ONE;
 		BigDecimal auxResultado = resultado;
 		BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), tempMathContext);
-		int k2 = indice - 1;
-
-		int lastCorrectDigit = -1;
-
-		while (true) {
+		int i= 0;
+		do{
 			resultado = k1.multiply(
 					resultado.multiply(BigDecimal.valueOf(k2)).add(valor.divide(resultado.pow(k2), tempMathContext)));
-
 			lastCorrectDigit = firstDifferentDigit(resultado, auxResultado);
 			auxResultado = resultado;
-
-			if (lastCorrectDigit >= mathContext.getPrecision()) {
-				break;
-			}
-		}
-		return resultado.setScale(mathContext.getPrecision(), mathContext.getRoundingMode()).stripTrailingZeros();
+		}while(lastCorrectDigit < precisao);
+		return resultado.setScale(precisao, roundingMode).stripTrailingZeros();
 	}
 
 	private int firstDifferentDigit(BigDecimal a, BigDecimal b) {
