@@ -24,7 +24,7 @@ public class ArvoreExpressoes {
 	}
 
 	public void armazenarExpressao(String expressao) {
-
+		
 		validarExpressao(expressao);
 
 		ArrayList<String> lista = new ArrayList<String>();
@@ -36,7 +36,7 @@ public class ArvoreExpressoes {
 				continue;
 			} else if ("()".contains(expressao.charAt(i) + "")) {
 				lista.add(expressao.charAt(i) + "");
-			} else if (operadores.contains(expressao.charAt(i) + "") && nO + 1 < nV) {
+			} else if (operadores.contains(expressao.charAt(i) + "") && nO + 2 < nV) {
 				lista.add(expressao.charAt(i) + "");
 				nO++;
 			} else {
