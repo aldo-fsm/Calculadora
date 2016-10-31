@@ -303,7 +303,8 @@ public class ArvoreExpressoes {
 				if(indiceNegativo)return BigDecimal.ONE.divide(retorno);
 				return retorno;
 			case "~":
-				if(expressao2.intValue()<0)return BigDecimal.ONE.divide(raiz(expressao1, expressao2.intValue()));
+				
+				if(expressao2.intValue()<0)return BigDecimal.ONE.divide(raiz(expressao1, BigDecimal.ZERO.subtract(expressao2).intValue()),mathContext);
 				return raiz(expressao1, expressao2.intValue());
 			case "%":
 				return expressao1.remainder(expressao2);
