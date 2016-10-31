@@ -15,9 +15,8 @@ public class ArvoreExpressoes {
 	private Node<String> root;
 	private Scanner scanner;
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
-	private static final String operadores = "%^~*/-+"; // operadores em ordem
-														// de
-														// precedencia
+	// operadores em ordem de precedencia
+	private static final String operadores = "%^~*/-+"; 
 
 	public void acrescentaNaExpressao(String expressao) {
 		expressao = "(" + expressaoEmOrdem() + expressao + ")";
@@ -83,63 +82,6 @@ public class ArvoreExpressoes {
 		tradutorDeExpressoes(lista.get(0));
 	}
 
-	private void adicionarParenteses(List<String> expressao, int inicio, int fim) {
-		int i = 0;
-		while (i < operadores.length()) {
-			char operador = operadores.charAt(i);
-			List<String> subExpressao = expressao.subList(inicio, fim);
-			int index = inicio + subExpressao.indexOf(operador + "");
-			if (index > inicio && index < fim) {
-				String left = index > 0 ? expressao.get(index - 1) : "";
-				String right = index < expressao.size() ? expressao.get(index + 1) : "";
-				expressao.add(index, "(" + left + operador + right + ")");
-				expressao.remove(index + 2);
-				expressao.remove(index + 1);
-				expressao.remove(index - 1);
-				fim -= 2;
-			} else {
-				i++;
-			}
-		}
-	}
-
-	private void validarExpressao(String expressao) {
-		pilhaArray<Character> pilha = new pilhaArray<Character>();
-		boolean expressaoInvalida = false;
-		int posicaoErro = -1;
-		try {
-			int j = -4;
-			for (int i = 0; i < expressao.length(); i++) {
-				posicaoErro = i;
-				if (expressao.charAt(i) == '(') {
-					j = i;
-					pilha.push('(');
-				} else if (expressao.charAt(i) == ')') {
-					if (j >= i - 3) {
-						expressaoInvalida = true;
-					}
-					pilha.pop();
-				}
-			}
-			if (!pilha.isEmpty()){
-				posicaoErro = j;
-				expressaoInvalida = true;
-			}
-		} catch (RuntimeException e) {
-			expressaoInvalida = true;
-		}
-		if (expressaoInvalida) {
-			String indicadorErro = "";
-			int procuraErro = 0;
-			while (procuraErro < posicaoErro) {
-				indicadorErro += " ";
-				procuraErro++;
-			}
-			indicadorErro += "^";
-			throw new InvalidParameterException("Expressao mal formada\n" + expressao + "\n" + indicadorErro);
-		}
-	}
-
 	public String expressaoEmOrdem() {
 		return auxExpressaoEmOrdem(root);
 	}
@@ -189,7 +131,7 @@ public class ArvoreExpressoes {
 					}
 					if (expressao.charAt(i) == '(') {
 						i++;
-						if(expressao.charAt(i+1) != '-'){
+						if (expressao.charAt(i + 1) != '-') {
 							valor += expressao.charAt(i);
 							i++;
 						}
@@ -267,6 +209,26 @@ public class ArvoreExpressoes {
 		adicionarNode(pilhaArvores.pop());
 	}
 
+	private void adicionarParenteses(List<String> expressao, int inicio, int fim) {
+		int i = 0;
+		while (i < operadores.length()) {
+			char operador = operadores.charAt(i);
+			List<String> subExpressao = expressao.subList(inicio, fim);
+			int index = inicio + subExpressao.indexOf(operador + "");
+			if (index > inicio && index < fim) {
+				String left = index > 0 ? expressao.get(index - 1) : "";
+				String right = index < expressao.size() ? expressao.get(index + 1) : "";
+				expressao.add(index, "(" + left + operador + right + ")");
+				expressao.remove(index + 2);
+				expressao.remove(index + 1);
+				expressao.remove(index - 1);
+				fim -= 2;
+			} else {
+				i++;
+			}
+		}
+	}
+	
 	private String auxExpressaoEmOrdem(Node<String> node) {
 		if (node != null) {
 			if (node.getLeftNode() == null && node.getRightNode() == null) {
@@ -320,6 +282,11 @@ public class ArvoreExpressoes {
 			case "+":
 				return expressao1.add(expressao2);
 			case "^":
+				boolean indiceNegativo = false;
+				if(expressao2.compareTo(BigDecimal.ZERO)<0) {
+					indiceNegativo = true;
+					expressao2 = BigDecimal.ZERO.subtract(expressao2);
+				}
 				BigDecimal retorno = expressao1.pow(expressao2.intValue());
 				BigDecimal numerosAposVirgula = expressao2.subtract(BigDecimal.valueOf(expressao2.intValue()));
 				int valorRaiz = 1;
@@ -333,8 +300,10 @@ public class ArvoreExpressoes {
 					retornoDecimal = retornoDecimal.pow(numerosAposVirgula.intValue());
 					retorno = retorno.multiply(raiz(retornoDecimal, valorRaiz));
 				}
+				if(indiceNegativo)return BigDecimal.ONE.divide(retorno);
 				return retorno;
 			case "~":
+				if(expressao2.intValue()<0)return BigDecimal.ONE.divide(raiz(expressao1, expressao2.intValue()));
 				return raiz(expressao1, expressao2.intValue());
 			case "%":
 				return expressao1.remainder(expressao2);
@@ -343,6 +312,43 @@ public class ArvoreExpressoes {
 		return BigDecimal.ZERO;
 	}
 
+	private void validarExpressao(String expressao) {
+		pilhaArray<Character> pilha = new pilhaArray<Character>();
+		boolean expressaoInvalida = false;
+		int posicaoErro = -1;
+		try {
+			int j = -4;
+			for (int i = 0; i < expressao.length(); i++) {
+				posicaoErro = i;
+				if (expressao.charAt(i) == '(') {
+					j = i;
+					pilha.push('(');
+				} else if (expressao.charAt(i) == ')') {
+					if (j >= i - 3) {
+						expressaoInvalida = true;
+					}
+					pilha.pop();
+				}
+			}
+			if (!pilha.isEmpty()){
+				posicaoErro = j;
+				expressaoInvalida = true;
+			}
+		} catch (RuntimeException e) {
+			expressaoInvalida = true;
+		}
+		if (expressaoInvalida) {
+			String indicadorErro = "";
+			int procuraErro = 0;
+			while (procuraErro < posicaoErro) {
+				indicadorErro += " ";
+				procuraErro++;
+			}
+			indicadorErro += "^";
+			throw new InvalidParameterException("Expressao mal formada\n" + expressao + "\n" + indicadorErro);
+		}
+	}
+	
 	private void auxInformaVariaveis(Node<String> raiz, ListaArray<String> variaveis,
 			ListaArray<String> valoresCorrespondentes) {
 		if (raiz != null) {
@@ -408,4 +414,5 @@ public class ArvoreExpressoes {
 		}
 		return i;
 	}
+
 }
