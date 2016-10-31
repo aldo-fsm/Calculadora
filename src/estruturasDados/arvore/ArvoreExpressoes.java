@@ -104,9 +104,9 @@ public class ArvoreExpressoes {
 		int nV = 0;
 		int nO = 0;
 		root = null;
-		if (!expressao.contains(operadores)) {
+		if (expressao.length() < 3) {
 			root = new Node<String>();
-			if (!expressao.contains("()")) {
+			if (expressao.length() == 1) {
 				root.setElemento(expressao);
 			} else if (expressao.charAt(0) == '-') {
 				root.setElemento("-" + expressao.charAt(1) + "");
