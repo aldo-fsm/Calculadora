@@ -88,7 +88,7 @@ public class ArvoreExpressoes {
 	public void setPrecision(int precision) {
 		mathContext = new MathContext(precision, mathContext.getRoundingMode());
 	}
-	
+
 	private void tradutorDeExpressoes(Fila<String> expressao) {
 		root = null;
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
@@ -146,56 +146,89 @@ public class ArvoreExpressoes {
 			retorno.enqueue(expressao.get(1));
 			return retorno;
 		} else {
-			String left = "";
-			String right = "";
+			String left = "", right = "";
 			char operador = ' ';
+			int index, i, inicio, fim;
+			Fila<String> retornoAuxtoRight = new Fila<String>(), retornoAuxtoLeft = new Fila<String>();
 			while (expressao.size() > 1) {
-				int fim = expressao.indexOf(")");
-				int inicio;
+				fim = expressao.indexOf(")");
 				for (inicio = fim; inicio > 0; inicio--) {
 					if (expressao.get(inicio).equals("("))
 						break;
 				}
 				expressao.remove(inicio);
 				expressao.remove(fim - 1);
-				int i = 0;
+				i = 0;
 				while (i < operadores.length()) {
 					operador = operadores.charAt(i);
 					List<String> subExpressao = expressao.subList(inicio, fim - 1);
-					int index = inicio + subExpressao.indexOf(operador + "");
+					index = inicio + subExpressao.indexOf(operador + "");
 					left = index > 0 ? expressao.get(index - 1) : "";
 					right = index < expressao.size() ? expressao.get(index + 1) : "";
 					if (index > inicio && index < fim) {
-							Fila<String> retornoAux = new Fila<String>();
+						boolean colocaAdireita = retornoAuxtoRight.isEmpty();
+						if (colocaAdireita) {
 							while (!retorno.isEmpty()) {
-								retornoAux.enqueue(retorno.dequeue());
+								retornoAuxtoRight.enqueue(retorno.dequeue());
 							}
-							if (left.charAt(0) == '('&&right.charAt(0)!='(') {
-								retorno.enqueue("(");
-								while (!retornoAux.isEmpty()) {
-									retorno.enqueue(retornoAux.dequeue());
+							colocaAdireita = false;
+						} else{
+							while (!retorno.isEmpty()) {
+								retornoAuxtoLeft.enqueue(retorno.dequeue());
+							}
+						}
+						if (left.charAt(0) == '(' && right.charAt(0) != '(') {
+							retorno.enqueue("(");
+							if (!colocaAdireita) {
+								while (!retornoAuxtoRight.isEmpty()) {
+									retorno.enqueue(retornoAuxtoRight.dequeue());
 								}
-								retorno.enqueue(operador + "");
-								retorno.enqueue(right);
-								retorno.enqueue(")");
-							} else if(right.charAt(0) == '('&&left.charAt(0) != '('){
-								retorno.enqueue("(");
-								retorno.enqueue(left);
-								retorno.enqueue(operador + "");
-								while (!retornoAux.isEmpty()) {
-									retorno.enqueue(retornoAux.dequeue());
-								}
-								retorno.enqueue(")");
-							}else if (right.charAt(0) != '('&&left.charAt(0) != '(') {
-								retorno.enqueue("(");
-								retorno.enqueue(left);
-								retorno.enqueue(operador + "");
-								retorno.enqueue(right);
-								retorno.enqueue(")");
+								colocaAdireita = true;
 							} else{
-								//TODO colocar na fila corretamente caso os dois lados sejam intercalados, como por exemplo ((2+2)+(2-2))
-								throw new InvalidParameterException("Codigo ainda em construção: acrescentarParenteses");
+								while (!retornoAuxtoLeft.isEmpty()) {
+									retorno.enqueue(retornoAuxtoLeft.dequeue());
+								}
 							}
+							retorno.enqueue(operador + "");
+							retorno.enqueue(right);
+							retorno.enqueue(")");
+						} else if (right.charAt(0) == '(' && left.charAt(0) != '(') {
+							retorno.enqueue("(");
+							retorno.enqueue(left);
+							retorno.enqueue(operador + "");
+							if (!colocaAdireita) {
+								while (!retornoAuxtoRight.isEmpty()) {
+									retorno.enqueue(retornoAuxtoRight.dequeue());
+								}
+								colocaAdireita = false;
+							} else{
+								while (!retornoAuxtoLeft.isEmpty()) {
+									retorno.enqueue(retornoAuxtoLeft.dequeue());
+								}
+							}
+							retorno.enqueue(")");
+						} else if (right.charAt(0) != '(' && left.charAt(0) != '(') {
+							retorno.enqueue("(");
+							retorno.enqueue(left);
+							retorno.enqueue(operador + "");
+							retorno.enqueue(right);
+							retorno.enqueue(")");
+						} else {
+							retorno.enqueue("(");
+							System.out.println(1);
+							while (!retornoAuxtoLeft.isEmpty()) {
+								System.out.print(retornoAuxtoLeft.espia());
+								retorno.enqueue(retornoAuxtoLeft.dequeue());
+							}
+							System.out.print(operador + "");
+							retorno.enqueue(operador + "");
+							while (!retornoAuxtoRight.isEmpty()) {
+								System.out.print(retornoAuxtoRight.espia());
+								retorno.enqueue(retornoAuxtoRight.dequeue());
+							}
+							System.out.println();
+							retorno.enqueue(")");
+						}
 						expressao.add(index, "(" + left + operador + right + ")");
 						expressao.remove(index + 2);
 						expressao.remove(index + 1);
@@ -234,7 +267,7 @@ public class ArvoreExpressoes {
 
 	private BigDecimal auxCalcularExpressao(Node<String> raiz, ListaArray<String> variaveis,
 			ListaArray<BigDecimal> valoresCorrespondentes) {
-		
+
 		if (root != null) {
 			if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
 				String numeros = "-0123456789";
