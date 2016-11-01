@@ -7,6 +7,7 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
 import estruturaDados.fila.Fila;
 import estruturasDados.lista.ListaArray;
 import estruturasDados.pilha.pilhaArray;
@@ -84,8 +85,11 @@ public class ArvoreExpressoes {
 		return auxCalcularExpressao(root, variaveis, valoresCorrespondentes);
 	}
 
+	public void setPrecision(int precision) {
+		mathContext = new MathContext(precision, mathContext.getRoundingMode());
+	}
+	
 	private void tradutorDeExpressoes(Fila<String> expressao) {
-		int i = 0;
 		root = null;
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
@@ -184,7 +188,7 @@ public class ArvoreExpressoes {
 								retorno.enqueue(")");
 							} else {
 								retorno.enqueue("(");
-								retorno.enqueue(right);
+								retorno.enqueue(left);
 								retorno.enqueue(operador + "");
 								while (!retornoAux.isEmpty()) {
 									retorno.enqueue(retornoAux.dequeue());
@@ -231,6 +235,7 @@ public class ArvoreExpressoes {
 
 	private BigDecimal auxCalcularExpressao(Node<String> raiz, ListaArray<String> variaveis,
 			ListaArray<BigDecimal> valoresCorrespondentes) {
+		
 		if (root != null) {
 			if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
 				String numeros = "-0123456789";
@@ -333,6 +338,7 @@ public class ArvoreExpressoes {
 
 	private void auxInformaVariaveis(Node<String> raiz, ListaArray<String> variaveis,
 			ListaArray<String> valoresCorrespondentes) {
+		System.out.println(expressaoEmOrdem());
 		if (raiz != null) {
 			if (raiz.getElemento() != "") {
 				auxInformaVariaveis(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
@@ -356,10 +362,6 @@ public class ArvoreExpressoes {
 			}
 		}
 
-	}
-
-	public void setPrecision(int precision) {
-		mathContext = new MathContext(precision, mathContext.getRoundingMode());
 	}
 
 	private BigDecimal raiz(BigDecimal valor, int indice) {
