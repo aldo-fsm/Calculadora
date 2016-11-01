@@ -307,7 +307,7 @@ public class ArvoreExpressoes {
 					retorno = retorno.multiply(raiz(retornoDecimal, valorRaiz));
 				}
 				if (indiceNegativo)
-					return BigDecimal.ONE.divide(retorno);
+					return BigDecimal.ONE.divide(retorno,mathContext);
 				return retorno;
 			case "~":
 
