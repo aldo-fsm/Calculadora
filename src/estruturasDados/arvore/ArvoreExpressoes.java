@@ -166,19 +166,11 @@ public class ArvoreExpressoes {
 					left = index > 0 ? expressao.get(index - 1) : "";
 					right = index < expressao.size() ? expressao.get(index + 1) : "";
 					if (index > inicio && index < fim) {
-
-						if (retorno.isEmpty()) {
-							retorno.enqueue("(");
-							retorno.enqueue(left);
-							retorno.enqueue(operador + "");
-							retorno.enqueue(right);
-							retorno.enqueue(")");
-						} else {
 							Fila<String> retornoAux = new Fila<String>();
 							while (!retorno.isEmpty()) {
 								retornoAux.enqueue(retorno.dequeue());
 							}
-							if (left.charAt(0) == '(') {
+							if (left.charAt(0) == '('&&right.charAt(0)!='(') {
 								retorno.enqueue("(");
 								while (!retornoAux.isEmpty()) {
 									retorno.enqueue(retornoAux.dequeue());
@@ -186,7 +178,7 @@ public class ArvoreExpressoes {
 								retorno.enqueue(operador + "");
 								retorno.enqueue(right);
 								retorno.enqueue(")");
-							} else {
+							} else if(right.charAt(0) == '('&&left.charAt(0) != '('){
 								retorno.enqueue("(");
 								retorno.enqueue(left);
 								retorno.enqueue(operador + "");
@@ -194,9 +186,16 @@ public class ArvoreExpressoes {
 									retorno.enqueue(retornoAux.dequeue());
 								}
 								retorno.enqueue(")");
+							}else if (right.charAt(0) != '('&&left.charAt(0) != '(') {
+								retorno.enqueue("(");
+								retorno.enqueue(left);
+								retorno.enqueue(operador + "");
+								retorno.enqueue(right);
+								retorno.enqueue(")");
+							} else{
+								//TODO colocar na fila corretamente caso os dois lados sejam intercalados, como por exemplo ((2+2)+(2-2))
+								throw new InvalidParameterException("Codigo ainda em construção: acrescentarParenteses");
 							}
-
-						}
 						expressao.add(index, "(" + left + operador + right + ")");
 						expressao.remove(index + 2);
 						expressao.remove(index + 1);
@@ -338,7 +337,6 @@ public class ArvoreExpressoes {
 
 	private void auxInformaVariaveis(Node<String> raiz, ListaArray<String> variaveis,
 			ListaArray<String> valoresCorrespondentes) {
-		System.out.println(expressaoEmOrdem());
 		if (raiz != null) {
 			if (raiz.getElemento() != "") {
 				auxInformaVariaveis(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
