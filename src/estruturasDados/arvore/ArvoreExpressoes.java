@@ -7,7 +7,7 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
+import estruturaDados.fila.Fila;
 import estruturasDados.lista.ListaArray;
 import estruturasDados.pilha.pilhaArray;
 
@@ -24,9 +24,7 @@ public class ArvoreExpressoes {
 	}
 
 	public void armazenarExpressao(String expressao) {
-		
 		validarExpressao(expressao);
-
 		ArrayList<String> lista = new ArrayList<String>();
 		expressao = "(" + expressao + ")";
 		boolean eSinal = false;
@@ -35,9 +33,9 @@ public class ArvoreExpressoes {
 				continue;
 			} else if ("()".contains(expressao.charAt(i) + "")) {
 				lista.add(expressao.charAt(i) + "");
-			}else {
+			} else {
 				String numero = "";
-				if (operadores.contains(expressao.charAt(i) + "") && expressao.charAt(i) != '-'&&!eSinal) {
+				if (operadores.contains(expressao.charAt(i) + "") && expressao.charAt(i) != '-' && !eSinal) {
 					lista.add(expressao.charAt(i) + "");
 					eSinal = true;
 					continue;
@@ -64,18 +62,8 @@ public class ArvoreExpressoes {
 				eSinal = false;
 			}
 		}
-		while (lista.size() > 1) {
-			int fim = lista.indexOf(")");
-			int inicio;
-			for (inicio = fim; inicio > 0; inicio--) {
-				if (lista.get(inicio).equals("("))
-					break;
-			}
-			lista.remove(inicio);
-			lista.remove(fim - 1);
-			adicionarParenteses(lista, inicio, fim - 1);
-		}
-		tradutorDeExpressoes(lista.get(0));
+		Fila<String> filaExpressao = adicionarParenteses(lista);
+		tradutorDeExpressoes(filaExpressao);
 	}
 
 	public String expressaoEmOrdem() {
@@ -96,115 +84,48 @@ public class ArvoreExpressoes {
 		return auxCalcularExpressao(root, variaveis, valoresCorrespondentes);
 	}
 
-	private void tradutorDeExpressoes(String expressao) {
+	private void tradutorDeExpressoes(Fila<String> expressao) {
+		int i = 0;
 		root = null;
-		boolean operadorJaPosto = false;
-		boolean apenasValor = true;
-		for (int contador = 0; contador < expressao.length(); contador++) {
-			if ("-0123456789.".indexOf(expressao.charAt(contador)) != -1) {
-				if (contador > 1 && expressao.charAt(contador) == '-') {
-					apenasValor = false;
-					break;
-				}
-				apenasValor = true;
-			} else {
-				apenasValor = false;
-				break;
-			}
-		}
-		if (expressao.length() < 3) {
-			root = new Node<String>();
-			root.setElemento(expressao);
-			return;
-		} else if (apenasValor) {
-			root = new Node<String>();
-			root.setElemento(expressao);
-			return;
-		}
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
 		String valor;
-		for (int i = 0; i < expressao.length(); i++) {
-			valor = "";
-			if (expressao.charAt(i) == ' ')
+		while (!expressao.isEmpty()) {
+			if (expressao.espia().equals(" ")) {
+				expressao.dequeue();
 				continue;
+			}
 			// caso parenteses abrindo
-			if (expressao.charAt(i) == '(') {
-				while (expressao.charAt(i) != ')') {
-					if (expressao.charAt(i) == ' ') {
-						i++;
-						continue;
-					}
-					if (expressao.charAt(i) == '(') {
-						i++;
-						continue;
-					}
-					if ((operadorJaPosto || valor == "") && expressao.charAt(i) == '-') {
-						valor += '-';
-						i++;
-						continue;
-					} else if (operadores.contains("" + expressao.charAt(i))) {
-						break;
-					}
-					valor = valor + expressao.charAt(i);
-					i++;
-				}
-				Node<String> nodeAux = new Node<String>();
-				nodeAux.setElemento(valor);
-				pilhaArvores.push(nodeAux);
-				if (expressao.charAt(i) == ')') {
+			else if (expressao.espia().equals("(")) {
+				expressao.dequeue();
+				if (expressao.espia().equals(")") || expressao.espia().equals("(") || expressao.espia().equals(" ")) {
+					expressao.dequeue();
 					continue;
 				}
-				pilhaOperadores.push(expressao.charAt(i) + "");
-				operadorJaPosto = true;
-			}
-			// caso seja um operador
-			else if (operadores.indexOf(expressao.charAt(i)) != -1) {
-				if (i > 0) {
-					if (operadorJaPosto && expressao.charAt(i) == '-') {
-						valor += expressao.charAt(i++);
-						while (operadores.indexOf(expressao.charAt(i)) == -1 && expressao.charAt(i) != ')') {
-							if (expressao.charAt(i) == ' ') {
-								i++;
-								continue;
-							}
-							if (expressao.charAt(i) == '(') {
-								i++;
-								continue;
-							}
-							valor = valor + expressao.charAt(i);
-							i++;
-						}
-						Node<String> nodeAux = new Node<String>();
-						nodeAux.setElemento(valor);
-						pilhaArvores.push(nodeAux);
-						operadorJaPosto = false;
-						i--;
-						continue;
-					}
-				}
-				pilhaOperadores.push(expressao.charAt(i) + "");
-				operadorJaPosto = true;
-			}
-			// caso seja um valor
-			else if (expressao.charAt(i) != ')') {
-				valor = "";
-				while (expressao.charAt(i) != ')') {
-					if (expressao.charAt(i) == ' ') {
-						i++;
-						continue;
-					}
-					valor = valor + expressao.charAt(i);
-					i++;
-				}
-				i--;
 				Node<String> nodeAux = new Node<String>();
+				valor = expressao.dequeue();
 				nodeAux.setElemento(valor);
 				pilhaArvores.push(nodeAux);
-				operadorJaPosto = false;
+				if (expressao.espia().equals(")") || expressao.espia().equals("(") || expressao.espia().equals(" ")) {
+					expressao.dequeue();
+					continue;
+				}
+				pilhaOperadores.push(expressao.dequeue() + "");
+			}
+			// caso seja um operador
+			else if (operadores.contains(expressao.espia())) {
+				pilhaOperadores.push(expressao.dequeue() + "");
+			}
+			// caso seja um valor
+			else if (!expressao.espia().equals(")")) {
+				Node<String> nodeAux = new Node<String>();
+				valor = expressao.dequeue();
+				nodeAux.setElemento(valor);
+				pilhaArvores.push(nodeAux);
 			}
 			// caso seja um parenteses fechando
 			else {
+				expressao.dequeue();
 				Node<String> novoElemento = new Node<String>();
 				novoElemento.setElemento(pilhaOperadores.pop());
 				novoElemento.setRightNode(pilhaArvores.pop());
@@ -215,23 +136,74 @@ public class ArvoreExpressoes {
 		adicionarNode(pilhaArvores.pop());
 	}
 
-	private void adicionarParenteses(List<String> expressao, int inicio, int fim) {
-		int i = 0;
-		while (i < operadores.length()) {
-			char operador = operadores.charAt(i);
-			List<String> subExpressao = expressao.subList(inicio, fim);
-			int index = inicio + subExpressao.indexOf(operador + "");
-			if (index > inicio && index < fim) {
-				String left = index > 0 ? expressao.get(index - 1) : "";
-				String right = index < expressao.size() ? expressao.get(index + 1) : "";
-				expressao.add(index, "(" + left + operador + right + ")");
-				expressao.remove(index + 2);
-				expressao.remove(index + 1);
-				expressao.remove(index - 1);
-				fim -= 2;
-			} else {
-				i++;
+	private Fila<String> adicionarParenteses(List<String> expressao) {
+		Fila<String> retorno = new Fila<String>();
+		if (expressao.size() == 3) {
+			retorno.enqueue(expressao.get(1));
+			return retorno;
+		} else {
+			String left = "";
+			String right = "";
+			char operador = ' ';
+			while (expressao.size() > 1) {
+				int fim = expressao.indexOf(")");
+				int inicio;
+				for (inicio = fim; inicio > 0; inicio--) {
+					if (expressao.get(inicio).equals("("))
+						break;
+				}
+				expressao.remove(inicio);
+				expressao.remove(fim - 1);
+				int i = 0;
+				while (i < operadores.length()) {
+					operador = operadores.charAt(i);
+					List<String> subExpressao = expressao.subList(inicio, fim - 1);
+					int index = inicio + subExpressao.indexOf(operador + "");
+					left = index > 0 ? expressao.get(index - 1) : "";
+					right = index < expressao.size() ? expressao.get(index + 1) : "";
+					if (index > inicio && index < fim) {
+
+						if (retorno.isEmpty()) {
+							retorno.enqueue("(");
+							retorno.enqueue(left);
+							retorno.enqueue(operador + "");
+							retorno.enqueue(right);
+							retorno.enqueue(")");
+						} else {
+							Fila<String> retornoAux = new Fila<String>();
+							while (!retorno.isEmpty()) {
+								retornoAux.enqueue(retorno.dequeue());
+							}
+							if (left.charAt(0) == '(') {
+								retorno.enqueue("(");
+								while (!retornoAux.isEmpty()) {
+									retorno.enqueue(retornoAux.dequeue());
+								}
+								retorno.enqueue(operador + "");
+								retorno.enqueue(right);
+								retorno.enqueue(")");
+							} else {
+								retorno.enqueue("(");
+								retorno.enqueue(right);
+								retorno.enqueue(operador + "");
+								while (!retornoAux.isEmpty()) {
+									retorno.enqueue(retornoAux.dequeue());
+								}
+								retorno.enqueue(")");
+							}
+
+						}
+						expressao.add(index, "(" + left + operador + right + ")");
+						expressao.remove(index + 2);
+						expressao.remove(index + 1);
+						expressao.remove(index - 1);
+						fim -= 2;
+					} else {
+						i++;
+					}
+				}
 			}
+			return retorno;
 		}
 	}
 
@@ -307,7 +279,7 @@ public class ArvoreExpressoes {
 					retorno = retorno.multiply(raiz(retornoDecimal, valorRaiz));
 				}
 				if (indiceNegativo)
-					return BigDecimal.ONE.divide(retorno,mathContext);
+					return BigDecimal.ONE.divide(retorno, mathContext);
 				return retorno;
 			case "~":
 
