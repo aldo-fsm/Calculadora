@@ -37,10 +37,9 @@ public class ArvoreExpressoes {
 				lista.add(expressao.charAt(i) + "");
 			}else {
 				String numero = "";
-				if (operadores.contains(expressao.charAt(i) + "") && (expressao.charAt(i) != '-'&&!eSinal)) {
-					System.out.println(expressao.charAt(i)+"");
+				if (operadores.contains(expressao.charAt(i) + "") && expressao.charAt(i) != '-'&&!eSinal) {
 					lista.add(expressao.charAt(i) + "");
-					eSinal = false;
+					eSinal = true;
 					continue;
 				} else {
 					numero += expressao.charAt(i);
@@ -62,7 +61,7 @@ public class ArvoreExpressoes {
 				lista.add(numero);
 				if (i < expressao.length())
 					lista.add(expressao.charAt(i) + "");
-				eSinal = true;
+				eSinal = false;
 			}
 		}
 		while (lista.size() > 1) {
