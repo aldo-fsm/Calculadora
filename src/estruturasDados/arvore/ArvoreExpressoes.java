@@ -11,7 +11,9 @@ import java.util.Scanner;
 
 import estruturasDados.fila.Fila;
 import estruturasDados.fila.FilaArray;
+import estruturasDados.lista.Lista;
 import estruturasDados.lista.ListaArray;
+import estruturasDados.pilha.Pilha;
 import estruturasDados.pilha.pilhaArray;
 
 public class ArvoreExpressoes {
@@ -129,16 +131,16 @@ public class ArvoreExpressoes {
 	}
 
 	public void informarVariaveis() {
-		ListaArray<String> variaveis = new ListaArray<String>();
-		ListaArray<String> valoresCorrespondentes = new ListaArray<String>();
+		Lista<String> variaveis = new ListaArray<String>();
+		Lista<String> valoresCorrespondentes = new ListaArray<String>();
 		auxInformaVariaveis(root, variaveis, valoresCorrespondentes);
 	}
 
 	public BigDecimal calcularExpressao() {
 		if (root.getLeftNode() == null)
 			return new BigDecimal(root.getElemento());
-		ListaArray<String> variaveis = new ListaArray<String>();
-		ListaArray<BigDecimal> valoresCorrespondentes = new ListaArray<BigDecimal>();
+		Lista<String> variaveis = new ListaArray<String>();
+		Lista<BigDecimal> valoresCorrespondentes = new ListaArray<BigDecimal>();
 		return auxCalcularExpressao(root, variaveis, valoresCorrespondentes);
 	}
 
@@ -148,8 +150,8 @@ public class ArvoreExpressoes {
 
 	private void tradutorDeExpressoes(Fila<String> expressao) {
 		root = null;
-		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
-		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
+		Pilha<String> pilhaOperadores = new pilhaArray<String>();
+		Pilha<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
 
 		String simbolo;
 		while (!expressao.isEmpty()) {
@@ -194,8 +196,8 @@ public class ArvoreExpressoes {
 		}
 	}
 
-	private BigDecimal auxCalcularExpressao(Node<String> raiz, ListaArray<String> variaveis,
-			ListaArray<BigDecimal> valoresCorrespondentes) {
+	private BigDecimal auxCalcularExpressao(Node<String> raiz, Lista<String> variaveis,
+			Lista<BigDecimal> valoresCorrespondentes) {
 
 		if (root != null) {
 			if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
@@ -261,7 +263,7 @@ public class ArvoreExpressoes {
 	}
 
 	private void validarExpressao(String expressao) {
-		pilhaArray<Character> pilha = new pilhaArray<Character>();
+		Pilha<Character> pilha = new pilhaArray<Character>();
 		boolean expressaoInvalida = false;
 		int posicaoErro = -1;
 		try {
@@ -297,8 +299,7 @@ public class ArvoreExpressoes {
 		}
 	}
 
-	private void auxInformaVariaveis(Node<String> raiz, ListaArray<String> variaveis,
-			ListaArray<String> valoresCorrespondentes) {
+	private void auxInformaVariaveis(Node<String> raiz, Lista<String> variaveis, Lista<String> valoresCorrespondentes) {
 		if (raiz != null) {
 			if (raiz.getElemento() != "") {
 				auxInformaVariaveis(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
