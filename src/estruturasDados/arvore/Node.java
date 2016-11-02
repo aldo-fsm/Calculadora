@@ -6,6 +6,12 @@ public class Node<T> {
 	private Node<T> leftNode;
 	private T elemento;
 
+	public Node() {}
+	
+	public Node(T elemento){
+		this.elemento = elemento;
+	}
+	
 	public Node<T> getRightNode() {
 		return rightNode;
 	}

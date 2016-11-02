@@ -1,11 +1,18 @@
  package estruturasDados.lista;
 
+import estruturasDados.fila.Fila;
+
 public class ListaArray <T>{
 	private Object[] elementos;
 	private int size = 0;
 	
 	public ListaArray(){
 		
+	}
+	public ListaArray(Fila<T> fila){
+		while(!fila.isEmpty()){
+			adicionar(fila.dequeue());
+		}
 	}
 	
 	public void adicionar(T elemento){
@@ -62,6 +69,9 @@ public class ListaArray <T>{
 	
 	public T get(int posicao){
 		return (T)elementos[posicao];
+	}
+	public int size() {
+		return size;
 	}
 	
 }

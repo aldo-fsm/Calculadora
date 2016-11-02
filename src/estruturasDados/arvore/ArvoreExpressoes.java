@@ -5,9 +5,12 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
-import estruturaDados.fila.Fila;
+
+import estruturasDados.fila.Fila;
+import estruturasDados.fila.FilaArray;
 import estruturasDados.lista.ListaArray;
 import estruturasDados.pilha.pilhaArray;
 
@@ -24,47 +27,147 @@ public class ArvoreExpressoes {
 	}
 
 	public void armazenarExpressao(String expressao) {
+
 		validarExpressao(expressao);
-		ArrayList<String> lista = new ArrayList<String>();
+
+		ArrayList<Object> lista = new ArrayList<Object>();
 		expressao = "(" + expressao + ")";
-		boolean eSinal = false;
+
 		for (int i = 0; i < expressao.length(); i++) {
 			if (expressao.charAt(i) == ' ') {
 				continue;
 			} else if ("()".contains(expressao.charAt(i) + "")) {
 				lista.add(expressao.charAt(i) + "");
+			} else if (operadores.contains(expressao.charAt(i) + "")) {
+				if (expressao.charAt(i) == '-') {
+					if ((operadores + "(").contains("" + expressao.charAt(i - 1))) {
+						String numero = extractNumber(expressao, i);
+						lista.add(numero);
+						i += numero.length() - 1;
+						continue;
+					}
+				}
+				lista.add(expressao.charAt(i) + "");
 			} else {
-				String numero = "";
-				if (operadores.contains(expressao.charAt(i) + "") && expressao.charAt(i) != '-' && !eSinal) {
-					lista.add(expressao.charAt(i) + "");
-					eSinal = true;
-					continue;
-				} else {
-					numero += expressao.charAt(i);
-					i++;
-				}
-				boolean variavelJaNomeada = false;
-				while (i < expressao.length()) {
-					if ("()".contains(expressao.charAt(i) + "") || operadores.contains(expressao.charAt(i) + "")) {
-						break;
-					}
-					if (!variavelJaNomeada) {
-						numero += expressao.charAt(i);
-					}
-					if (!"0123456789".contains(expressao.charAt(i + 1) + "")) {
-						variavelJaNomeada = true;
-					}
-					i++;
-				}
+				String numero = extractNumber(expressao, i);
 				lista.add(numero);
-				if (i < expressao.length())
-					lista.add(expressao.charAt(i) + "");
-				eSinal = false;
+				i += numero.length() - 1;
+				// if (i < expressao.length())
+				// lista.add(expressao.charAt(i) + "");
 			}
 		}
-		Fila<String> filaExpressao = adicionarParenteses(lista);
-		tradutorDeExpressoes(filaExpressao);
+		while (lista.size() > 1)
+
+		{
+			int fim = lista.indexOf(")");
+			int inicio;
+			for (inicio = fim; inicio > 0; inicio--) {
+				if (lista.get(inicio).equals("("))
+					break;
+			}
+			lista.remove(inicio);
+			lista.remove(fim - 1);
+			adicionarParenteses(lista, inicio, fim - 1);
+		}
+
+		Fila<String> aaa = new FilaArray<String>();
+		lista = (ArrayList<Object>) lista.get(0);
+		for (int i = 0; i < lista.size(); i++) {
+			aaa.enqueue(lista.get(i).toString());
+		}
+
+		tradutorDeExpressoes(aaa);
 	}
+
+	private void adicionarParenteses(List<Object> expressao, int inicio, int fim) {
+		int i = 0;
+		while (i < operadores.length()) {
+			char operador = operadores.charAt(i);
+			List<Object> subExpressao = expressao.subList(inicio, fim);
+			int index = inicio + subExpressao.indexOf(operador + "");
+			if (index > inicio && index < fim) {
+				Object left = index > 0 ? expressao.get(index - 1) : null;
+				Object right = index < expressao.size() ? expressao.get(index + 1) : null;
+				expressao.add(index, listConcat("(", left, operador, right, ")"));
+				expressao.remove(index + 2);
+				expressao.remove(index + 1);
+				expressao.remove(index - 1);
+				fim -= 2;
+			} else {
+				i++;
+			}
+		}
+	}
+
+	private ArrayList listConcat(Object... objects) {
+		ArrayList lista = new ArrayList();
+		for (Object object : objects) {
+			if (object != null) {
+				if (object instanceof ArrayList) {
+					lista.addAll((Collection) object);
+				} else {
+					lista.add(object);
+				}
+			}
+		}
+		return lista;
+	}
+
+	private String extractNumber(String expressao, int inicio) {
+		String numero = expressao.charAt(inicio) + "";
+		for (int i = inicio + 1; i < expressao.length(); i++) {
+			if ((operadores + "()").contains(expressao.charAt(i) + ""))
+				break;
+			numero += expressao.charAt(i);
+		}
+		return numero;
+
+	}
+
+	// public void armazenarExpressao(String expressao) {
+	// validarExpressao(expressao);
+	// ArrayList<String> lista = new ArrayList<String>();
+	// expressao = "(" + expressao + ")";
+	// boolean eSinal = false;
+	// for (int i = 0; i < expressao.length(); i++) {
+	// if (expressao.charAt(i) == ' ') {
+	// continue;
+	// } else if ("()".contains(expressao.charAt(i) + "")) {
+	// lista.add(expressao.charAt(i) + "");
+	// } else {
+	// String numero = "";
+	// if (operadores.contains(expressao.charAt(i) + "") && expressao.charAt(i)
+	// != '-' && !eSinal) {
+	// lista.add(expressao.charAt(i) + "");
+	// eSinal = true;
+	// continue;
+	// } else {
+	// numero += expressao.charAt(i);
+	// i++;
+	// }
+	// boolean variavelJaNomeada = false;
+	// while (i < expressao.length()) {
+	// if ("()".contains(expressao.charAt(i) + "") ||
+	// operadores.contains(expressao.charAt(i) + "")) {
+	// break;
+	// }
+	// if (!variavelJaNomeada) {
+	// numero += expressao.charAt(i);
+	// }
+	// if (!"0123456789".contains(expressao.charAt(i + 1) + "")) {
+	// variavelJaNomeada = true;
+	// }
+	// i++;
+	// }
+	// lista.add(numero);
+	// if (i < expressao.length())
+	// lista.add(expressao.charAt(i) + "");
+	// eSinal = false;
+	// }
+	// }
+	// Fila<String> filaExpressao = adicionarParenteses(lista);
+	// tradutorDeExpressoes(filaExpressao);
+	// }
 
 	public String expressaoEmOrdem() {
 		return auxExpressaoEmOrdem(root);
@@ -93,149 +196,174 @@ public class ArvoreExpressoes {
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
 		String valor;
+
+		String simbolo;
 		while (!expressao.isEmpty()) {
-			if (expressao.espia().equals(" ")) {
-				expressao.dequeue();
+			simbolo = expressao.dequeue();
+			if (simbolo.equals("(")) {
 				continue;
-			}
-			// caso parenteses abrindo
-			else if (expressao.espia().equals("(")) {
-				expressao.dequeue();
-				if (expressao.espia().equals(")") || expressao.espia().equals("(") || expressao.espia().equals(" ")) {
-					expressao.dequeue();
-					continue;
-				}
-				Node<String> nodeAux = new Node<String>();
-				valor = expressao.dequeue();
-				nodeAux.setElemento(valor);
-				pilhaArvores.push(nodeAux);
-				if (expressao.espia().equals(")") || expressao.espia().equals("(") || expressao.espia().equals(" ")) {
-					expressao.dequeue();
-					continue;
-				}
-				pilhaOperadores.push(expressao.dequeue() + "");
-			}
-			// caso seja um operador
-			else if (operadores.contains(expressao.espia())) {
-				pilhaOperadores.push(expressao.dequeue() + "");
-			}
-			// caso seja um valor
-			else if (!expressao.espia().equals(")")) {
-				Node<String> nodeAux = new Node<String>();
-				valor = expressao.dequeue();
-				nodeAux.setElemento(valor);
-				pilhaArvores.push(nodeAux);
-			}
-			// caso seja um parenteses fechando
-			else {
-				expressao.dequeue();
+			} else if (operadores.contains(simbolo))
+				pilhaOperadores.push(simbolo);
+			else if (simbolo.equals(")")) {
 				Node<String> novoElemento = new Node<String>();
 				novoElemento.setElemento(pilhaOperadores.pop());
 				novoElemento.setRightNode(pilhaArvores.pop());
 				novoElemento.setLeftNode(pilhaArvores.pop());
 				pilhaArvores.push(novoElemento);
+			} else {
+				Node<String> nodeAux = new Node<String>(simbolo);
+				pilhaArvores.push(nodeAux);
 			}
 		}
 		adicionarNode(pilhaArvores.pop());
+
+		// while (!expressao.isEmpty()) {
+		// if (expressao.peek().equals(" ")) {
+		// expressao.dequeue();
+		// continue;
+		// }
+		// // caso parenteses abrindo
+		// else if (expressao.peek().equals("(")) {
+		// expressao.dequeue();
+		// if (expressao.peek().equals(")") || expressao.peek().equals("(") ||
+		// expressao.peek().equals(" ")) {
+		// expressao.dequeue();
+		// continue;
+		// }
+		// Node<String> nodeAux = new Node<String>();
+		// valor = expressao.dequeue();
+		// nodeAux.setElemento(valor);
+		// pilhaArvores.push(nodeAux);
+		// if (expressao.peek().equals(")") || expressao.peek().equals("(") ||
+		// expressao.peek().equals(" ")) {
+		// expressao.dequeue();
+		// continue;
+		// }
+		// pilhaOperadores.push(expressao.dequeue() + "");
+		// }
+		// // caso seja um operador
+		// else if (operadores.contains(expressao.peek())) {
+		// pilhaOperadores.push(expressao.dequeue() + "");
+		// }
+		// // caso seja um valor
+		// else if (!expressao.peek().equals(")")) {
+		// Node<String> nodeAux = new Node<String>();
+		// valor = expressao.dequeue();
+		// nodeAux.setElemento(valor);
+		// pilhaArvores.push(nodeAux);
+		// }
+		// // caso seja um parenteses fechando
+		// else {
+		// expressao.dequeue();
+		// Node<String> novoElemento = new Node<String>();
+		// novoElemento.setElemento(pilhaOperadores.pop());
+		// novoElemento.setRightNode(pilhaArvores.pop());
+		// novoElemento.setLeftNode(pilhaArvores.pop());
+		// pilhaArvores.push(novoElemento);
+		// }
+		// }
+		// adicionarNode(pilhaArvores.pop());
 	}
 
-	private Fila<String> adicionarParenteses(List<String> expressao) {
-		Fila<String> retorno = new Fila<String>();
-		if (expressao.size() == 3) {
-			retorno.enqueue(expressao.get(1));
-			return retorno;
-		} else {
-			String left = "", right = "";
-			char operador = ' ';
-			int index, i, inicio, fim;
-			Fila<String> retornoAuxtoRight = new Fila<String>(), retornoAuxtoLeft = new Fila<String>();
-			while (expressao.size() > 1) {
-				fim = expressao.indexOf(")");
-				for (inicio = fim; inicio > 0; inicio--) {
-					if (expressao.get(inicio).equals("("))
-						break;
-				}
-				expressao.remove(inicio);
-				expressao.remove(fim - 1);
-				i = 0;
-				while (i < operadores.length()) {
-					operador = operadores.charAt(i);
-					List<String> subExpressao = expressao.subList(inicio, fim - 1);
-					index = inicio + subExpressao.indexOf(operador + "");
-					left = index > 0 ? expressao.get(index - 1) : "";
-					right = index < expressao.size() ? expressao.get(index + 1) : "";
-					if (index > inicio && index < fim) {
-						boolean colocaAdireita = retornoAuxtoRight.isEmpty();
-						if (colocaAdireita) {
-							while (!retorno.isEmpty()) {
-								retornoAuxtoRight.enqueue(retorno.dequeue());
-							}
-							colocaAdireita = false;
-						} else{
-							while (!retorno.isEmpty()) {
-								retornoAuxtoLeft.enqueue(retorno.dequeue());
-							}
-						}
-						if (left.charAt(0) == '(' && right.charAt(0) != '(') {
-							retorno.enqueue("(");
-							if (!colocaAdireita) {
-								while (!retornoAuxtoRight.isEmpty()) {
-									retorno.enqueue(retornoAuxtoRight.dequeue());
-								}
-								colocaAdireita = true;
-							} else{
-								while (!retornoAuxtoLeft.isEmpty()) {
-									retorno.enqueue(retornoAuxtoLeft.dequeue());
-								}
-							}
-							retorno.enqueue(operador + "");
-							retorno.enqueue(right);
-							retorno.enqueue(")");
-						} else if (right.charAt(0) == '(' && left.charAt(0) != '(') {
-							retorno.enqueue("(");
-							retorno.enqueue(left);
-							retorno.enqueue(operador + "");
-							if (!colocaAdireita) {
-								while (!retornoAuxtoRight.isEmpty()) {
-									retorno.enqueue(retornoAuxtoRight.dequeue());
-								}
-								colocaAdireita = false;
-							} else{
-								while (!retornoAuxtoLeft.isEmpty()) {
-									retorno.enqueue(retornoAuxtoLeft.dequeue());
-								}
-							}
-							retorno.enqueue(")");
-						} else if (right.charAt(0) != '(' && left.charAt(0) != '(') {
-							retorno.enqueue("(");
-							retorno.enqueue(left);
-							retorno.enqueue(operador + "");
-							retorno.enqueue(right);
-							retorno.enqueue(")");
-						} else {
-							retorno.enqueue("(");
-							while (!retornoAuxtoLeft.isEmpty()) {
-								retorno.enqueue(retornoAuxtoLeft.dequeue());
-							}
-							retorno.enqueue(operador + "");
-							while (!retornoAuxtoRight.isEmpty()) {
-								retorno.enqueue(retornoAuxtoRight.dequeue());
-							}
-							retorno.enqueue(")");
-						}
-						expressao.add(index, "(" + left + operador + right + ")");
-						expressao.remove(index + 2);
-						expressao.remove(index + 1);
-						expressao.remove(index - 1);
-						fim -= 2;
-					} else {
-						i++;
-					}
-				}
-			}
-			return retorno;
-		}
-	}
+	// private Fila<String> adicionarParenteses(List<String> expressao) {
+	// Fila<String> retorno = new FilaArray<String>();
+	//
+	// if (expressao.size() == 3) {
+	// retorno.enqueue(expressao.get(1));
+	// return retorno;
+	// } else {
+	// String left = "", right = "";
+	// char operador = ' ';
+	// int index, i, inicio, fim;
+	// Fila<String> retornoAuxtoRight = new FilaArray<String>(),
+	// retornoAuxtoLeft = new FilaArray<String>();
+	// while (expressao.size() > 1) {
+	// fim = expressao.indexOf(")");
+	// for (inicio = fim; inicio > 0; inicio--) {
+	// if (expressao.get(inicio).equals("("))
+	// break;
+	// }
+	// expressao.remove(inicio);
+	// expressao.remove(fim - 1);
+	// i = 0;
+	// while (i < operadores.length()) {
+	// operador = operadores.charAt(i);
+	// List<String> subExpressao = expressao.subList(inicio, fim - 1);
+	// index = inicio + subExpressao.indexOf(operador + "");
+	// left = index > 0 ? expressao.get(index - 1) : "";
+	// right = index < expressao.size() ? expressao.get(index + 1) : "";
+	// if (index > inicio && index < fim) {
+	// boolean colocaAdireita = retornoAuxtoRight.isEmpty();
+	// if (colocaAdireita) {
+	// while (!retorno.isEmpty()) {
+	// retornoAuxtoRight.enqueue(retorno.dequeue());
+	// }
+	// colocaAdireita = false;
+	// } else{
+	// while (!retorno.isEmpty()) {
+	// retornoAuxtoLeft.enqueue(retorno.dequeue());
+	// }
+	// }
+	// if (left.charAt(0) == '(' && right.charAt(0) != '(') {
+	// retorno.enqueue("(");
+	// if (!colocaAdireita) {
+	// while (!retornoAuxtoRight.isEmpty()) {
+	// retorno.enqueue(retornoAuxtoRight.dequeue());
+	// }
+	// colocaAdireita = true;
+	// } else{
+	// while (!retornoAuxtoLeft.isEmpty()) {
+	// retorno.enqueue(retornoAuxtoLeft.dequeue());
+	// }
+	// }
+	// retorno.enqueue(operador + "");
+	// retorno.enqueue(right);
+	// retorno.enqueue(")");
+	// } else if (right.charAt(0) == '(' && left.charAt(0) != '(') {
+	// retorno.enqueue("(");
+	// retorno.enqueue(left);
+	// retorno.enqueue(operador + "");
+	// if (!colocaAdireita) {
+	// while (!retornoAuxtoRight.isEmpty()) {
+	// retorno.enqueue(retornoAuxtoRight.dequeue());
+	// }
+	// colocaAdireita = false;
+	// } else{
+	// while (!retornoAuxtoLeft.isEmpty()) {
+	// retorno.enqueue(retornoAuxtoLeft.dequeue());
+	// }
+	// }
+	// retorno.enqueue(")");
+	// } else if (right.charAt(0) != '(' && left.charAt(0) != '(') {
+	// retorno.enqueue("(");
+	// retorno.enqueue(left);
+	// retorno.enqueue(operador + "");
+	// retorno.enqueue(right);
+	// retorno.enqueue(")");
+	// } else {
+	// retorno.enqueue("(");
+	// while (!retornoAuxtoLeft.isEmpty()) {
+	// retorno.enqueue(retornoAuxtoLeft.dequeue());
+	// }
+	// retorno.enqueue(operador + "");
+	// while (!retornoAuxtoRight.isEmpty()) {
+	// retorno.enqueue(retornoAuxtoRight.dequeue());
+	// }
+	// retorno.enqueue(")");
+	// }
+	// expressao.add(index, "(" + left + operador + right + ")");
+	// expressao.remove(index + 2);
+	// expressao.remove(index + 1);
+	// expressao.remove(index - 1);
+	// fim -= 2;
+	// } else {
+	// i++;
+	// }
+	// }
+	// }
+	// return retorno;
+	// }
+	// }
 
 	private String auxExpressaoEmOrdem(Node<String> node) {
 		if (node != null) {
