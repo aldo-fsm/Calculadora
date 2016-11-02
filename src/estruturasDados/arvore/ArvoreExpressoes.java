@@ -150,7 +150,6 @@ public class ArvoreExpressoes {
 		root = null;
 		pilhaArray<String> pilhaOperadores = new pilhaArray<String>();
 		pilhaArray<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
-		String valor;
 
 		String simbolo;
 		while (!expressao.isEmpty()) {
