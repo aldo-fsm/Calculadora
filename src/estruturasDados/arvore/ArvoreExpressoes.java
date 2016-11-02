@@ -7,7 +7,6 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
 import estruturaDados.fila.Fila;
 import estruturasDados.lista.ListaArray;
 import estruturasDados.pilha.pilhaArray;
@@ -215,18 +214,13 @@ public class ArvoreExpressoes {
 							retorno.enqueue(")");
 						} else {
 							retorno.enqueue("(");
-							System.out.println(1);
-							while (!retornoAuxtoLeft.isEmpty()) {
-								System.out.print(retornoAuxtoLeft.espia());
-								retorno.enqueue(retornoAuxtoLeft.dequeue());
-							}
-							System.out.print(operador + "");
-							retorno.enqueue(operador + "");
 							while (!retornoAuxtoRight.isEmpty()) {
-								System.out.print(retornoAuxtoRight.espia());
 								retorno.enqueue(retornoAuxtoRight.dequeue());
 							}
-							System.out.println();
+							retorno.enqueue(operador + "");
+							while (!retornoAuxtoLeft.isEmpty()) {
+								retorno.enqueue(retornoAuxtoLeft.dequeue());
+							}
 							retorno.enqueue(")");
 						}
 						expressao.add(index, "(" + left + operador + right + ")");
