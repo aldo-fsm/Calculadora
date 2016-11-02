@@ -214,12 +214,12 @@ public class ArvoreExpressoes {
 							retorno.enqueue(")");
 						} else {
 							retorno.enqueue("(");
-							while (!retornoAuxtoRight.isEmpty()) {
-								retorno.enqueue(retornoAuxtoRight.dequeue());
-							}
-							retorno.enqueue(operador + "");
 							while (!retornoAuxtoLeft.isEmpty()) {
 								retorno.enqueue(retornoAuxtoLeft.dequeue());
+							}
+							retorno.enqueue(operador + "");
+							while (!retornoAuxtoRight.isEmpty()) {
+								retorno.enqueue(retornoAuxtoRight.dequeue());
 							}
 							retorno.enqueue(")");
 						}
