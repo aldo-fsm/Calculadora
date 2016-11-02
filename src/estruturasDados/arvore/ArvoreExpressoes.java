@@ -116,13 +116,14 @@ public class ArvoreExpressoes {
 	private String extractNumber(String expressao, int inicio) {
 		String numero = expressao.charAt(inicio) + "";
 		for (int i = inicio + 1; i < expressao.length(); i++) {
-			if ((operadores + "()").contains(expressao.charAt(i) + ""))
+			if ((operadores + "( )").contains(expressao.charAt(i) + ""))
 				break;
 			numero += expressao.charAt(i);
 		}
 		return numero;
 
 	}
+
 	public String expressaoEmOrdem() {
 		return auxExpressaoEmOrdem(root);
 	}
