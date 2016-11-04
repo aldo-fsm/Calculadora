@@ -144,7 +144,7 @@ public class ArvoreExpressoes {
 		Lista<Racional> valoresCorrespondentes = new ListaArray<Racional>();
 		Racional resultado = auxCalcularExpressao(root, variaveis, valoresCorrespondentes);
 		resultado.setbigDecimalConversionPrecision(mathContext.getPrecision());
-		return resultado; 
+		return resultado;
 	}
 
 	public void setPrecision(int precision) {
@@ -236,25 +236,10 @@ public class ArvoreExpressoes {
 					indiceNegativo = true;
 					expressao2 = Racional.ZERO.subtrair(expressao2);
 				}
-				Racional retorno = expressao1.pow(expressao2.intValue());
-				Racional numerosAposVirgula = expressao2.subtrair(Racional.valueOf(expressao2.intValue()));
-				int valorRaiz = 1;
-				for (int i = 0; i < numerosAposVirgula.toString().length() - 2; i++) {
-					valorRaiz = valorRaiz * 10;
-					numerosAposVirgula = numerosAposVirgula.multiplicar(Racional.TEN);
-				}
-				Racional retornoDecimal = Racional.ONE;
-				if (numerosAposVirgula.intValue() != 0) {
-					retornoDecimal = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
-					retornoDecimal = retornoDecimal.pow(numerosAposVirgula.intValue());
-					retorno = retorno
-							.multiplicar(raiz(retornoDecimal.bigDecimalValue(mathContext.getPrecision()), valorRaiz));
-				}
-				if (indiceNegativo)
-					return Racional.ONE.dividir(retorno);
-				return retorno;
+				Racional retorno = expressao1.pow(expressao2.getNumerador().intValue());
+				return raiz(retorno.bigDecimalValue(mathContext.getPrecision()),
+						expressao2.getDenominador().intValue());
 			case "~":
-
 				if (expressao2.intValue() < 0)
 					return Racional.ONE.dividir(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
 							Racional.ZERO.subtrair(expressao2).intValue()));
