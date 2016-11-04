@@ -99,6 +99,27 @@ public class Racional extends Number {
 		return resultado;
 	}
 
+	public Racional inverso() {
+		if (numerador.equals(BigInteger.ZERO))
+			throw new ArithmeticException("divisão por zero");
+		Racional resultado = new Racional();
+		resultado.numerador = denominador;
+		resultado.denominador = numerador;
+		return resultado;
+	}
+
+	public Racional pow(int potencia) {
+		if (potencia < 0) {
+			return this.inverso().pow(-potencia);
+		}
+		Racional resultado = new Racional();
+		resultado.numerador = numerador.pow(potencia);
+		resultado.denominador.pow(potencia);
+		resultado.simplificar();
+
+		return resultado;
+	}
+
 	// maximo multiplo comum pelo algoritmo de Euclides
 	private BigInteger mdc(BigInteger a, BigInteger b) {
 		if (b.compareTo(a) > 0) {
