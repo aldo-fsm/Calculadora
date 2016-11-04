@@ -9,8 +9,8 @@ public class Racional extends Number {
 
 	private static final long serialVersionUID = 1L;
 
-	BigInteger numerador;
-	BigInteger denominador;
+	private BigInteger numerador;
+	private BigInteger denominador;
 
 	public Racional() {
 	}
