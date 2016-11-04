@@ -72,13 +72,13 @@ public class ArvoreExpressoes {
 			adicionarParenteses(lista, inicio, fim - 1);
 		}
 
-		Fila<String> aaa = new FilaArray<String>();
+		Fila<String> fila = new FilaArray<String>();
 		lista = (ArrayList<Object>) lista.get(0);
 		for (int i = 0; i < lista.size(); i++) {
-			aaa.enqueue(lista.get(i).toString());
+			fila.enqueue(lista.get(i).toString());
 		}
 
-		tradutorDeExpressoes(aaa);
+		tradutorDeExpressoes(fila);
 	}
 
 	private void adicionarParenteses(List<Object> expressao, int inicio, int fim) {
