@@ -11,6 +11,7 @@ public class Racional extends Number {
 
 	private BigInteger numerador;
 	private BigInteger denominador;
+	private int defaultPrecision = 5;
 
 	public Racional() {
 	}
@@ -144,6 +145,11 @@ public class Racional extends Number {
 		BigDecimal denominador = new BigDecimal(this.denominador);
 		MathContext m = new MathContext(precision, RoundingMode.HALF_EVEN);
 		return numerador.divide(denominador, m);
+	}
+
+	@Override
+	public String toString() {
+		return bigDecimalValue(defaultPrecision).toString();
 	}
 
 	@Override
