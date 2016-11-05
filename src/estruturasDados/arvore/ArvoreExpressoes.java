@@ -343,36 +343,50 @@ public class ArvoreExpressoes {
 	// calcula a raiz de indice indice usando o método de newton
 	private BigDecimal raiz(BigDecimal valor, int indice) {
 
-		if (valor.intValue() < 0 && indice % 2 == 0) {
+		if (valor.compareTo(BigDecimal.ZERO) < 0 && indice % 2 == 0) {
 			throw new ArithmeticException("raiz par de numero negativo");
 		} else if (indice == 1) {
 			return valor;
 		}
 
-		int k2 = indice - 1;
-		int lastCorrectDigit = -1;
-		int precisao = mathContext.getPrecision();
+		Fila<Integer> fatores = new FilaArray<Integer>();
+		int i = 2;
+		while (indice >= i) {
+			while (indice % i == 0) {
+				indice = indice / i;
+				fatores.enqueue(i);
+			}
+			i++;
+		}
 
+		int precisao = mathContext.getPrecision();
 		RoundingMode roundingMode = mathContext.getRoundingMode();
 		MathContext tempMathContext = new MathContext(precisao + 5, roundingMode);
 
-		// aproximação inicial
-		BigDecimal resultado = BigDecimal.ONE;
-		BigDecimal auxResultado = resultado;
+		while (!fatores.isEmpty()) {
+			indice = fatores.dequeue();
 
-		BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), tempMathContext);
-		do {
+			// aproximação inicial
+			BigDecimal resultado = BigDecimal.ONE;
+			BigDecimal auxResultado = resultado;
 
-			// x[k] = x[k-1]-f(x[k-1])/f'(x[k-1])
-			// se f(x) = x^n - a
-			// então x[k] = (1/n)*(x[k-1]*(n-1)+a/(x[k-1]^(n-1)))
-			resultado = k1.multiply(
-					resultado.multiply(BigDecimal.valueOf(k2)).add(valor.divide(resultado.pow(k2), tempMathContext)));
+			int lastCorrectDigit = -1;
+			BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), tempMathContext);
+			int k2 = indice - 1;
 
-			lastCorrectDigit = firstDifferentDigit(resultado, auxResultado);
-			auxResultado = resultado;
-		} while (lastCorrectDigit < precisao);
-		return resultado.setScale(precisao, roundingMode).stripTrailingZeros();
+			do {
+
+				// x[k] = x[k-1]-f(x[k-1])/f'(x[k-1])
+				// se f(x) = x^n - a
+				// então x[k] = (1/n)*(x[k-1]*(n-1)+a/(x[k-1]^(n-1)))
+				resultado = k1.multiply(resultado.multiply(BigDecimal.valueOf(k2))
+						.add(valor.divide(resultado.pow(k2), tempMathContext)));
+				lastCorrectDigit = firstDifferentDigit(resultado, auxResultado);
+				auxResultado = resultado;
+			} while (lastCorrectDigit < precisao);
+			valor = resultado.setScale(precisao, roundingMode).stripTrailingZeros();
+		}
+		return valor.setScale(precisao, roundingMode);
 	}
 
 	private int firstDifferentDigit(BigDecimal a, BigDecimal b) {
