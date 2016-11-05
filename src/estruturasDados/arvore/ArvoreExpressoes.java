@@ -386,7 +386,7 @@ public class ArvoreExpressoes {
 			} while (lastCorrectDigit < precisao);
 			valor = resultado.setScale(precisao, roundingMode).stripTrailingZeros();
 		}
-		return valor.setScale(precisao, roundingMode);
+		return valor.setScale(precisao, roundingMode).stripTrailingZeros();
 	}
 
 	private int firstDifferentDigit(BigDecimal a, BigDecimal b) {
