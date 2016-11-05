@@ -19,15 +19,23 @@ import estruturasDados.pilha.pilhaArray;
 public class ArvoreExpressoes {
 	private Node<String> root;
 	private Scanner scanner;
+	// determina a precisão e o modo de arredondamento
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
 	// operadores em ordem de precedencia
-	private static final String operadores = "%^~*/-+";
+	private static final String operadores = "^~*/%-+";
 
 	public void acrescentaNaExpressao(String expressao) {
 		expressao = "(" + expressaoEmOrdem() + expressao + ")";
 		armazenarExpressao(expressao);
 	}
 
+	/**
+	 * Armazena uma expressão infixa na arvore de expressões.
+	 * 
+	 * @param expressao
+	 *            Expressão em notação infixa
+	 */
+	@SuppressWarnings("unchecked")
 	public void armazenarExpressao(String expressao) {
 
 		validarExpressao(expressao);
@@ -35,13 +43,18 @@ public class ArvoreExpressoes {
 		ArrayList<Object> lista = new ArrayList<Object>();
 		expressao = "(" + expressao + ")";
 
+		// coloca cada simbolo numa lista, agrupando numeros e nomes de
+		// variaveis em strings
 		for (int i = 0; i < expressao.length(); i++) {
 			if (expressao.charAt(i) == ' ') {
 				continue;
+				// se for parenteses
 			} else if ("()".contains(expressao.charAt(i) + "")) {
 				lista.add(expressao.charAt(i) + "");
+				// se for operador
 			} else if (operadores.contains(expressao.charAt(i) + "")) {
 				if (expressao.charAt(i) == '-') {
+					// verifica se o - é o sinal de um numero ou se é subtração
 					if ((operadores + "(").contains("" + expressao.charAt(i - 1))) {
 						String numero = extractNumber(expressao, i);
 						lista.add(numero);
@@ -50,17 +63,15 @@ public class ArvoreExpressoes {
 					}
 				}
 				lista.add(expressao.charAt(i) + "");
+				// se for um numero ou nome de variavel
 			} else {
 				String numero = extractNumber(expressao, i);
 				lista.add(numero);
 				i += numero.length() - 1;
-				// if (i < expressao.length())
-				// lista.add(expressao.charAt(i) + "");
 			}
 		}
-		while (lista.size() > 1)
-
-		{
+		// loop para adicionar parenteses
+		while (lista.size() > 1) {
 			int fim = lista.indexOf(")");
 			int inicio;
 			for (inicio = fim; inicio > 0; inicio--) {
@@ -81,6 +92,7 @@ public class ArvoreExpressoes {
 		tradutorDeExpressoes(fila);
 	}
 
+	// coloca parenteses de acordo com a precedencia dos operadores
 	private void adicionarParenteses(List<Object> expressao, int inicio, int fim) {
 		int i = 0;
 		while (i < operadores.length()) {
@@ -101,6 +113,7 @@ public class ArvoreExpressoes {
 		}
 	}
 
+	// concatena objetos em uma lista.
 	private ArrayList listConcat(Object... objects) {
 		ArrayList lista = new ArrayList();
 		for (Object object : objects) {
@@ -115,8 +128,10 @@ public class ArvoreExpressoes {
 		return lista;
 	}
 
+	// junta caracteres que representam um numero ou variavel em uma string
 	private String extractNumber(String expressao, int inicio) {
 		String numero = expressao.charAt(inicio) + "";
+		// concatena até encontrar parenteses, operadores ou espaço
 		for (int i = inicio + 1; i < expressao.length(); i++) {
 			if ((operadores + "( )").contains(expressao.charAt(i) + ""))
 				break;
@@ -325,23 +340,35 @@ public class ArvoreExpressoes {
 
 	}
 
+	// calcula a raiz de indice indice usando o método de newton
 	private BigDecimal raiz(BigDecimal valor, int indice) {
+
 		if (valor.intValue() < 0 && indice % 2 == 0) {
 			throw new ArithmeticException("raiz par de numero negativo");
 		} else if (indice == 1) {
 			return valor;
 		}
+
 		int k2 = indice - 1;
 		int lastCorrectDigit = -1;
 		int precisao = mathContext.getPrecision();
+
 		RoundingMode roundingMode = mathContext.getRoundingMode();
 		MathContext tempMathContext = new MathContext(precisao + 5, roundingMode);
+
+		// aproximação inicial
 		BigDecimal resultado = BigDecimal.ONE;
 		BigDecimal auxResultado = resultado;
+
 		BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), tempMathContext);
 		do {
+
+			// x[k] = x[k-1]-f(x[k-1])/f'(x[k-1])
+			// se f(x) = x^n - a
+			// então x[k] = (1/n)*(x[k-1]*(n-1)+a/(x[k-1]^(n-1)))
 			resultado = k1.multiply(
 					resultado.multiply(BigDecimal.valueOf(k2)).add(valor.divide(resultado.pow(k2), tempMathContext)));
+
 			lastCorrectDigit = firstDifferentDigit(resultado, auxResultado);
 			auxResultado = resultado;
 		} while (lastCorrectDigit < precisao);

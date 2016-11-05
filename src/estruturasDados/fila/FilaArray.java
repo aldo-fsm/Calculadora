@@ -1,5 +1,7 @@
 package estruturasDados.fila;
 
+import java.util.List;
+
 import estruturasDados.lista.ListaArray;
 
 public class FilaArray<T> implements Fila<T> {
@@ -68,7 +70,7 @@ public class FilaArray<T> implements Fila<T> {
 
 	@Override
 	public boolean isEmpty() {
-		return fim >-1 ? false: true;
+		return fim > -1 ? false : true;
 	}
 
 	private void redimensionar(int novoTamanho) {
