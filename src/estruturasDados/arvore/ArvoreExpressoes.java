@@ -15,6 +15,7 @@ import estruturasDados.lista.Lista;
 import estruturasDados.lista.ListaArray;
 import estruturasDados.pilha.Pilha;
 import estruturasDados.pilha.pilhaArray;
+import numeros.Racional;
 
 public class ArvoreExpressoes {
 	private Node<String> root;
@@ -151,12 +152,13 @@ public class ArvoreExpressoes {
 		auxInformaVariaveis(root, variaveis, valoresCorrespondentes);
 	}
 
-	public BigDecimal calcularExpressao() {
+	public Racional calcularExpressao() {
+		Racional.setBigDecimalConversionPrecision(mathContext.getPrecision());
 		if (root.getLeftNode() == null)
-			return new BigDecimal(root.getElemento());
+			return new Racional(root.getElemento());
 		Lista<String> variaveis = new ListaArray<String>();
-		Lista<BigDecimal> valoresCorrespondentes = new ListaArray<BigDecimal>();
-		return auxCalcularExpressao(root, variaveis, valoresCorrespondentes).stripTrailingZeros();
+		Lista<Racional> valoresCorrespondentes = new ListaArray<Racional>();
+		return auxCalcularExpressao(root, variaveis, valoresCorrespondentes);
 	}
 
 	public void setPrecision(int precision) {
@@ -211,8 +213,8 @@ public class ArvoreExpressoes {
 		}
 	}
 
-	private BigDecimal auxCalcularExpressao(Node<String> raiz, Lista<String> variaveis,
-			Lista<BigDecimal> valoresCorrespondentes) {
+	private Racional auxCalcularExpressao(Node<String> raiz, Lista<String> variaveis,
+			Lista<Racional> valoresCorrespondentes) {
 
 		if (root != null) {
 			if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
@@ -224,57 +226,39 @@ public class ArvoreExpressoes {
 						scanner = new Scanner(System.in);
 						variaveis.adicionar(raiz.getElemento().charAt(0) + "");
 						System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
-						BigDecimal tmp = new BigDecimal(scanner.nextLine());
+						Racional tmp = new Racional(scanner.nextLine());
 						valoresCorrespondentes.adicionar(tmp);
 						return tmp;
 					}
 				}
-				return new BigDecimal(raiz.getElemento());
+				return new Racional(raiz.getElemento());
 			}
-			BigDecimal expressao1 = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
-			BigDecimal expressao2 = auxCalcularExpressao(raiz.getRightNode(), variaveis, valoresCorrespondentes);
+			Racional expressao1 = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
+			Racional expressao2 = auxCalcularExpressao(raiz.getRightNode(), variaveis, valoresCorrespondentes);
 			switch (raiz.getElemento()) {
 			case "*":
-				return expressao1.multiply(expressao2);
+				return expressao1.multiplicar(expressao2);
 			case "/":
-				return expressao1.divide(expressao2, mathContext);
+				return expressao1.dividir(expressao2);
 			case "-":
-				return expressao1.subtract(expressao2);
+				return expressao1.subtrair(expressao2);
 			case "+":
-				return expressao1.add(expressao2);
+				return expressao1.somar(expressao2);
 			case "^":
-				boolean indiceNegativo = false;
-				if (expressao2.compareTo(BigDecimal.ZERO) < 0) {
-					indiceNegativo = true;
-					expressao2 = BigDecimal.ZERO.subtract(expressao2);
-				}
-				BigDecimal retorno = expressao1.pow(expressao2.intValue());
-				BigDecimal numerosAposVirgula = expressao2.subtract(BigDecimal.valueOf(expressao2.intValue()));
-				int valorRaiz = 1;
-				for (int i = 0; i < numerosAposVirgula.toString().length() - 2; i++) {
-					valorRaiz = valorRaiz * 10;
-					numerosAposVirgula = numerosAposVirgula.multiply(BigDecimal.TEN);
-				}
-				BigDecimal retornoDecimal = BigDecimal.ONE;
-				if (numerosAposVirgula.intValue() != 0) {
-					retornoDecimal = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
-					retornoDecimal = retornoDecimal.pow(numerosAposVirgula.intValue());
-					retorno = retorno.multiply(raiz(retornoDecimal, valorRaiz));
-				}
-				if (indiceNegativo)
-					return BigDecimal.ONE.divide(retorno, mathContext);
-				return retorno.setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
+				Racional retorno = expressao1.pow(expressao2.getNumerador().intValue());
+				retorno = Racional.valueOf(raiz(retorno.bigDecimalValue(mathContext.getPrecision()),
+						expressao2.getDenominador().intValue()));
+				return retorno;
 			case "~":
-
-				if (expressao2.intValue() < 0)
-					return BigDecimal.ONE.divide(raiz(expressao1, BigDecimal.ZERO.subtract(expressao2).intValue()),
-							mathContext);
-				return raiz(expressao1, expressao2.intValue());
+				if (expressao2.compareTo(Racional.ZERO) < 0)
+					expressao1 = expressao1.inverso();
+				return Racional.valueOf(
+						raiz(expressao1.bigDecimalValue(mathContext.getPrecision()), expressao2.abs().intValue()));
 			case "%":
-				return expressao1.remainder(expressao2);
+				return expressao1.resto(expressao2);
 			}
 		}
-		return BigDecimal.ZERO;
+		return Racional.ZERO;
 	}
 
 	private void validarExpressao(String expressao) {
