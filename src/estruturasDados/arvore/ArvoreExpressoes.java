@@ -156,7 +156,7 @@ public class ArvoreExpressoes {
 			return new BigDecimal(root.getElemento());
 		Lista<String> variaveis = new ListaArray<String>();
 		Lista<BigDecimal> valoresCorrespondentes = new ListaArray<BigDecimal>();
-		return auxCalcularExpressao(root, variaveis, valoresCorrespondentes);
+		return auxCalcularExpressao(root, variaveis, valoresCorrespondentes).stripTrailingZeros();
 	}
 
 	public void setPrecision(int precision) {
