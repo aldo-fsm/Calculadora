@@ -179,7 +179,7 @@ public class Racional extends Number implements Comparable<Racional> {
 	}
 
 	public Racional resto(Racional divisor) {
-		Racional divisaoInteira = new Racional(numerador.divide(denominador), BigInteger.ONE);
+		Racional divisaoInteira = new Racional(this.dividir(divisor).bigIntegerValue(), BigInteger.ONE);
 		return this.subtrair(divisaoInteira.multiplicar(divisor));
 	}
 
