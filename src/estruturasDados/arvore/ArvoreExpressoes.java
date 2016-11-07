@@ -245,9 +245,9 @@ public class ArvoreExpressoes {
 			case "+":
 				return expressao1.somar(expressao2);
 			case "^":
-				Racional retorno = expressao1.pow(expressao2.getNumerador().intValue());
-				retorno = Racional.valueOf(raiz(retorno.bigDecimalValue(mathContext.getPrecision()),
+				Racional retorno = Racional.valueOf(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
 						expressao2.getDenominador().intValue()));
+				retorno = retorno.pow(expressao2.getNumerador().intValue());
 				return retorno;
 			case "~":
 				if (expressao2.compareTo(Racional.ZERO) < 0)
