@@ -15,6 +15,7 @@ import estruturasDados.lista.Lista;
 import estruturasDados.lista.ListaArray;
 import estruturasDados.pilha.Pilha;
 import estruturasDados.pilha.pilhaArray;
+import exceptions.ExpressaoMalFormadaException;
 import numeros.Racional;
 
 public class ArvoreExpressoes {
@@ -84,6 +85,7 @@ public class ArvoreExpressoes {
 			adicionarParenteses(lista, inicio, fim - 1);
 		}
 
+		System.out.println(lista.get(0));
 		Fila<String> fila = new FilaArray<String>();
 		lista = (ArrayList<Object>) lista.get(0);
 		for (int i = 0; i < lista.size(); i++) {
@@ -171,24 +173,29 @@ public class ArvoreExpressoes {
 		Pilha<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
 
 		String simbolo;
-		while (!expressao.isEmpty()) {
-			simbolo = expressao.dequeue();
-			if (simbolo.equals("(")) {
-				continue;
-			} else if (operadores.contains(simbolo))
-				pilhaOperadores.push(simbolo);
-			else if (simbolo.equals(")")) {
-				Node<String> novoElemento = new Node<String>();
-				novoElemento.setElemento(pilhaOperadores.pop());
-				novoElemento.setRightNode(pilhaArvores.pop());
-				novoElemento.setLeftNode(pilhaArvores.pop());
-				pilhaArvores.push(novoElemento);
-			} else {
-				Node<String> nodeAux = new Node<String>(simbolo);
-				pilhaArvores.push(nodeAux);
+		try {
+			while (!expressao.isEmpty()) {
+				simbolo = expressao.dequeue();
+				if (simbolo.equals("(")) {
+					continue;
+				} else if (operadores.contains(simbolo))
+					pilhaOperadores.push(simbolo);
+				else if (simbolo.equals(")")) {
+					Node<String> novoElemento = new Node<String>();
+					novoElemento.setElemento(pilhaOperadores.pop());
+					novoElemento.setRightNode(pilhaArvores.pop());
+					novoElemento.setLeftNode(pilhaArvores.pop());
+					pilhaArvores.push(novoElemento);
+				} else {
+					Node<String> nodeAux = new Node<String>(simbolo);
+					pilhaArvores.push(nodeAux);
+				}
 			}
+			adicionarNode(pilhaArvores.pop());
+		} catch (RuntimeException e) {
+			throw new ExpressaoMalFormadaException();
 		}
-		adicionarNode(pilhaArvores.pop());
+
 	}
 
 	private String auxExpressaoEmOrdem(Node<String> node) {
@@ -273,7 +280,7 @@ public class ArvoreExpressoes {
 					j = i;
 					pilha.push('(');
 				} else if (expressao.charAt(i) == ')') {
-					if (j >= i - 3) {
+					if (j >= i - 1) {
 						expressaoInvalida = true;
 					}
 					pilha.pop();
@@ -294,7 +301,7 @@ public class ArvoreExpressoes {
 				procuraErro++;
 			}
 			indicadorErro += "^";
-			throw new InvalidParameterException("Expressao mal formada\n" + expressao + "\n" + indicadorErro);
+			throw new ExpressaoMalFormadaException(expressao + "\n" + indicadorErro);
 		}
 	}
 
@@ -359,10 +366,6 @@ public class ArvoreExpressoes {
 			int k2 = indice - 1;
 
 			do {
-
-				// x[k] = x[k-1]-f(x[k-1])/f'(x[k-1])
-				// se f(x) = x^n - a
-				// então x[k] = (1/n)*(x[k-1]*(n-1)+a/(x[k-1]^(n-1)))
 				resultado = k1.multiply(resultado.multiply(BigDecimal.valueOf(k2))
 						.add(valor.divide(resultado.pow(k2), tempMathContext)));
 				lastCorrectDigit = firstDifferentDigit(resultado, auxResultado);
