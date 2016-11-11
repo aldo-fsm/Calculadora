@@ -3,7 +3,6 @@ package estruturasDados.arvore;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +13,7 @@ import estruturasDados.fila.FilaArray;
 import estruturasDados.lista.Lista;
 import estruturasDados.lista.ListaArray;
 import estruturasDados.pilha.Pilha;
-import estruturasDados.pilha.pilhaArray;
+import estruturasDados.pilha.PilhaArray;
 import exceptions.ExpressaoMalFormadaException;
 import numeros.Racional;
 
@@ -55,15 +54,6 @@ public class ArvoreExpressoes {
 				lista.add(expressao.charAt(i) + "");
 				// se for operador
 			} else if (operadores.contains(expressao.charAt(i) + "")) {
-				if (expressao.charAt(i) == '-') {
-					// verifica se o - é o sinal de um numero ou se é subtração
-					if ((operadores + "(").contains("" + expressao.charAt(i - 1))) {
-						String numero = extractNumber(expressao, i);
-						lista.add(numero);
-						i += numero.length() - 1;
-						continue;
-					}
-				}
 				lista.add(expressao.charAt(i) + "");
 				// se for um numero ou nome de variavel
 			} else {
@@ -84,10 +74,14 @@ public class ArvoreExpressoes {
 			lista.remove(fim - 1);
 			adicionarParenteses(lista, inicio, fim - 1);
 		}
-
-		System.out.println(lista.get(0));
 		Fila<String> fila = new FilaArray<String>();
-		lista = (ArrayList<Object>) lista.get(0);
+		if (lista.get(0) instanceof ArrayList) {
+			lista = (ArrayList<Object>) lista.get(0);
+		} else {
+			Object aux = lista.get(0);
+			lista = new ArrayList<Object>();
+			lista.add(aux);
+		}
 		for (int i = 0; i < lista.size(); i++) {
 			fila.enqueue(lista.get(i).toString());
 		}
@@ -98,18 +92,27 @@ public class ArvoreExpressoes {
 	// coloca parenteses de acordo com a precedencia dos operadores
 	private void adicionarParenteses(List<Object> expressao, int inicio, int fim) {
 		int i = 0;
+		boolean isNotBinary = false;
 		while (i < operadores.length()) {
 			char operador = operadores.charAt(i);
 			List<Object> subExpressao = expressao.subList(inicio, fim);
 			int index = inicio + subExpressao.indexOf(operador + "");
-			if (index > inicio && index < fim) {
-				Object left = index > 0 ? expressao.get(index - 1) : null;
-				Object right = index < expressao.size() ? expressao.get(index + 1) : null;
-				expressao.add(index, listConcat("(", left, operador, right, ")"));
-				expressao.remove(index + 2);
-				expressao.remove(index + 1);
-				expressao.remove(index - 1);
-				fim -= 2;
+			if (index >= inicio && index < fim) {
+				isNotBinary = index == inicio || (operadores + "(").contains(expressao.get(index - 1).toString());
+				if (isNotBinary) {
+					expressao.add(index, listConcat(operador, expressao.get(index + 1)));
+					expressao.remove(index + 1);
+					expressao.remove(index + 1);
+					fim--;
+				} else {
+					Object left = index > 0 ? expressao.get(index - 1) : null;
+					Object right = index < expressao.size() ? expressao.get(index + 1) : null;
+					expressao.add(index, listConcat("(", left, operador, right, ")"));
+					expressao.remove(index + 2);
+					expressao.remove(index + 1);
+					expressao.remove(index - 1);
+					fim -= 2;
+				}
 			} else {
 				i++;
 			}
@@ -156,7 +159,7 @@ public class ArvoreExpressoes {
 
 	public Racional calcularExpressao() {
 		Racional.setBigDecimalConversionPrecision(mathContext.getPrecision());
-		if (root.getLeftNode() == null)
+		if (root.getLeftNode() == null && root.getRightNode() == null)
 			return new Racional(root.getElemento());
 		Lista<String> variaveis = new ListaArray<String>();
 		Lista<Racional> valoresCorrespondentes = new ListaArray<Racional>();
@@ -169,27 +172,43 @@ public class ArvoreExpressoes {
 
 	private void tradutorDeExpressoes(Fila<String> expressao) {
 		root = null;
-		Pilha<String> pilhaOperadores = new pilhaArray<String>();
-		Pilha<Node<String>> pilhaArvores = new pilhaArray<Node<String>>();
-
+		Pilha<String> pilhaOperadores = new PilhaArray<String>();
+		Pilha<Node<String>> pilhaArvores = new PilhaArray<Node<String>>();
 		String simbolo;
 		try {
+			boolean isBinary = false;
 			while (!expressao.isEmpty()) {
 				simbolo = expressao.dequeue();
 				if (simbolo.equals("(")) {
+					if(!isBinary){
+						
+					}
+					isBinary = false;
 					continue;
-				} else if (operadores.contains(simbolo))
+				} else if (operadores.contains(simbolo)){
 					pilhaOperadores.push(simbolo);
-				else if (simbolo.equals(")")) {
+					isBinary = false;
+				}else if (simbolo.equals(")")) {
 					Node<String> novoElemento = new Node<String>();
-					novoElemento.setElemento(pilhaOperadores.pop());
-					novoElemento.setRightNode(pilhaArvores.pop());
-					novoElemento.setLeftNode(pilhaArvores.pop());
+					if (!pilhaOperadores.isEmpty())
+						novoElemento.setElemento(pilhaOperadores.pop());
+					if (!pilhaArvores.isEmpty())
+						novoElemento.setRightNode(pilhaArvores.pop());
+					if (!pilhaArvores.isEmpty())
+						novoElemento.setLeftNode(pilhaArvores.pop());
 					pilhaArvores.push(novoElemento);
+					isBinary = true;
 				} else {
 					Node<String> nodeAux = new Node<String>(simbolo);
 					pilhaArvores.push(nodeAux);
+					isBinary = true;
 				}
+			}
+			if (!pilhaOperadores.isEmpty()) {
+				Node<String> novoElemento = new Node<String>();
+				novoElemento.setElemento(pilhaOperadores.pop());
+				novoElemento.setRightNode(pilhaArvores.pop());
+				pilhaArvores.push(novoElemento);
 			}
 			adicionarNode(pilhaArvores.pop());
 		} catch (RuntimeException e) {
@@ -207,7 +226,7 @@ public class ArvoreExpressoes {
 						+ auxExpressaoEmOrdem(node.getRightNode()) + ")";
 			}
 		}
-		return null;
+		return "";
 	}
 
 	private void adicionarNode(Node<String> novoElemento) {
@@ -222,54 +241,55 @@ public class ArvoreExpressoes {
 
 	private Racional auxCalcularExpressao(Node<String> raiz, Lista<String> variaveis,
 			Lista<Racional> valoresCorrespondentes) {
-
-		if (root != null) {
-			if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
-				String numeros = "-0123456789";
-				if (numeros.indexOf(raiz.getElemento().charAt(0)) == -1) {
-					if (variaveis.contem(raiz.getElemento().charAt(0) + "")) {
-						return valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + ""));
-					} else {
-						scanner = new Scanner(System.in);
-						variaveis.adicionar(raiz.getElemento().charAt(0) + "");
-						System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
-						Racional tmp = new Racional(scanner.nextLine());
-						valoresCorrespondentes.adicionar(tmp);
-						return tmp;
+		if (raiz != null) {
+			if (root != null) {
+				if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
+					String numeros = "-0123456789";
+					if (numeros.indexOf(raiz.getElemento().charAt(0)) == -1) {
+						if (variaveis.contem(raiz.getElemento().charAt(0) + "")) {
+							return valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + ""));
+						} else {
+							scanner = new Scanner(System.in);
+							variaveis.adicionar(raiz.getElemento().charAt(0) + "");
+							System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
+							Racional tmp = new Racional(scanner.nextLine());
+							valoresCorrespondentes.adicionar(tmp);
+							return tmp;
+						}
 					}
+					return new Racional(raiz.getElemento());
 				}
-				return new Racional(raiz.getElemento());
-			}
-			Racional expressao1 = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
-			Racional expressao2 = auxCalcularExpressao(raiz.getRightNode(), variaveis, valoresCorrespondentes);
-			switch (raiz.getElemento()) {
-			case "*":
-				return expressao1.multiplicar(expressao2);
-			case "/":
-				return expressao1.dividir(expressao2);
-			case "-":
-				return expressao1.subtrair(expressao2);
-			case "+":
-				return expressao1.somar(expressao2);
-			case "^":
-				Racional retorno = Racional.valueOf(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
-						expressao2.getDenominador().intValue()));
-				retorno = retorno.pow(expressao2.getNumerador().intValue());
-				return retorno;
-			case "~":
-				if (expressao2.compareTo(Racional.ZERO) < 0)
-					expressao1 = expressao1.inverso();
-				return Racional.valueOf(
-						raiz(expressao1.bigDecimalValue(mathContext.getPrecision()), expressao2.abs().intValue()));
-			case "%":
-				return expressao1.resto(expressao2);
+				Racional expressao1 = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
+				Racional expressao2 = auxCalcularExpressao(raiz.getRightNode(), variaveis, valoresCorrespondentes);
+				switch (raiz.getElemento()) {
+				case "*":
+					return expressao1.multiplicar(expressao2);
+				case "/":
+					return expressao1.dividir(expressao2);
+				case "-":
+					return expressao1.subtrair(expressao2);
+				case "+":
+					return expressao1.somar(expressao2);
+				case "^":
+					Racional retorno = Racional.valueOf(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
+							expressao2.getDenominador().intValue()));
+					retorno = retorno.pow(expressao2.getNumerador().intValue());
+					return retorno;
+				case "~":
+					if (expressao2.compareTo(Racional.ZERO) < 0)
+						expressao1 = expressao1.inverso();
+					return Racional.valueOf(
+							raiz(expressao1.bigDecimalValue(mathContext.getPrecision()), expressao2.abs().intValue()));
+				case "%":
+					return expressao1.resto(expressao2);
+				}
 			}
 		}
 		return Racional.ZERO;
 	}
 
 	private void validarExpressao(String expressao) {
-		Pilha<Character> pilha = new pilhaArray<Character>();
+		Pilha<Character> pilha = new PilhaArray<Character>();
 		boolean expressaoInvalida = false;
 		int posicaoErro = -1;
 		try {
