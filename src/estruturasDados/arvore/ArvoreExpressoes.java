@@ -23,7 +23,7 @@ public class ArvoreExpressoes {
 	// determina a precisão e o modo de arredondamento
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
 	// operadores em ordem de precedencia
-	private static final String operadores = "^~*/%-+";
+	private static final String operadores = "^~*%/-+";
 
 	public void acrescentaNaExpressao(String expressao) {
 		expressao = "(" + expressaoEmOrdem() + expressao + ")";
@@ -180,28 +180,44 @@ public class ArvoreExpressoes {
 			while (!expressao.isEmpty()) {
 				simbolo = expressao.dequeue();
 				if (simbolo.equals("(")) {
-					if(!isBinary){
-						
+					if (!isBinary) {
+						// pilhaOperadores.push(pilhaOperadores.pop() + "(");
 					}
 					isBinary = false;
 					continue;
-				} else if (operadores.contains(simbolo)){
-					pilhaOperadores.push(simbolo);
-					isBinary = false;
-				}else if (simbolo.equals(")")) {
+				} else if (operadores.contains(simbolo)) {
+					if (isBinary) {
+						pilhaOperadores.push(simbolo);
+					} else {
+						if ("0123456789".contains(expressao.peek())) {
+							pilhaOperadores.push(simbolo + expressao.dequeue());
+						} else {
+//							pilhaOperadores.push(simbolo + "u");
+						}
+						isBinary = true;
+					}
+				} else if (simbolo.equals(")")) {
 					Node<String> novoElemento = new Node<String>();
-					if (!pilhaOperadores.isEmpty())
-						novoElemento.setElemento(pilhaOperadores.pop());
-					if (!pilhaArvores.isEmpty())
-						novoElemento.setRightNode(pilhaArvores.pop());
-					if (!pilhaArvores.isEmpty())
-						novoElemento.setLeftNode(pilhaArvores.pop());
+					novoElemento.setElemento(pilhaOperadores.pop());
+					// if (novoElemento.getElemento().contains("u")) {
+					// novoElemento.setRightNode(pilhaArvores.pop());
+					// pilhaArvores.push(novoElemento);
+					// } else {
+					novoElemento.setRightNode(pilhaArvores.pop());
+					novoElemento.setLeftNode(pilhaArvores.pop());
 					pilhaArvores.push(novoElemento);
+					// }
 					isBinary = true;
 				} else {
-					Node<String> nodeAux = new Node<String>(simbolo);
-					pilhaArvores.push(nodeAux);
+					Node<String> nodeAux;
+					// if (isBinary) {
+					nodeAux = new Node<String>(simbolo);
+					// } else {
+					// nodeAux = new Node<String>(pilhaOperadores.pop() +
+					// simbolo);
+					// }
 					isBinary = true;
+					pilhaArvores.push(nodeAux);
 				}
 			}
 			if (!pilhaOperadores.isEmpty()) {
