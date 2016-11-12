@@ -216,13 +216,11 @@ public class ArvoreExpressoes {
 					pilhaArvores.push(novoElemento);
 					isBinary = true;
 					if(especialOperatorPresent){
-						//TODO
-						System.out.println("we still in construction");
 						String especialOperator = pilhaOperadores.pop();
 						Node<String> novoElemento2 = new Node<String>();
 						novoElemento2.setElemento(especialOperator);
 						novoElemento2.setRightNode(pilhaArvores.pop());
-						pilhaArvores.push(novoElemento);
+						pilhaArvores.push(novoElemento2);
 						especialOperatorPresent = false;
 					}
 				} else {
@@ -289,8 +287,10 @@ public class ArvoreExpressoes {
 				case "/":
 					return expressao1.dividir(expressao2);
 				case "-":
+					if(expressao1 == null) return Racional.ZERO.subtrair(expressao2);
 					return expressao1.subtrair(expressao2);
 				case "+":
+					if(expressao1 == null) return Racional.ZERO.somar(expressao2);
 					return expressao1.somar(expressao2);
 				case "^":
 					Racional retorno = Racional.valueOf(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
