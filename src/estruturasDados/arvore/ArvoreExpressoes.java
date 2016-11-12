@@ -20,7 +20,7 @@ import numeros.Racional;
 public class ArvoreExpressoes {
 	private Node<String> root;
 	private Scanner scanner;
-	// determina a precisÃ£o e o modo de arredondamento
+	// determina a precisao e o modo de arredondamento
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
 	// operadores em ordem de precedencia
 	private static final String operadores = "^~*%/-+";
@@ -117,11 +117,11 @@ public class ArvoreExpressoes {
 					expressao.remove(index + 2);
 					expressao.remove(index + 1);
 					expressao.remove(index - 1);
-					if(tmp){
+					if (tmp) {
 						expressao.remove(index);
 						fim -= 3;
-					}else{
-						fim -= 2;						
+					} else {
+						fim -= 2;
 					}
 				}
 			} else {
@@ -204,7 +204,7 @@ public class ArvoreExpressoes {
 						novoElemento.setElemento(simbolo);
 						pilhaArvores.push(novoElemento);
 						isBinary = true;
-					} else{
+					} else {
 						pilhaOperadores.push(simbolo);
 						especialOperatorPresent = true;
 					}
@@ -215,7 +215,7 @@ public class ArvoreExpressoes {
 					novoElemento.setLeftNode(pilhaArvores.pop());
 					pilhaArvores.push(novoElemento);
 					isBinary = true;
-					if(especialOperatorPresent){
+					if (especialOperatorPresent) {
 						String especialOperator = pilhaOperadores.pop();
 						Node<String> novoElemento2 = new Node<String>();
 						novoElemento2.setElemento(especialOperator);
@@ -287,10 +287,12 @@ public class ArvoreExpressoes {
 				case "/":
 					return expressao1.dividir(expressao2);
 				case "-":
-					if(expressao1 == null) return Racional.ZERO.subtrair(expressao2);
+					if (expressao1 == null)
+						return Racional.ZERO.subtrair(expressao2);
 					return expressao1.subtrair(expressao2);
 				case "+":
-					if(expressao1 == null) return Racional.ZERO.somar(expressao2);
+					if (expressao1 == null)
+						return Racional.ZERO.somar(expressao2);
 					return expressao1.somar(expressao2);
 				case "^":
 					Racional retorno = Racional.valueOf(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
