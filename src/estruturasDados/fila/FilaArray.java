@@ -84,7 +84,7 @@ public class FilaArray<T> implements Fila<T> {
 	@Override
 	public T peek() {
 		if (fim > -1) {
-			return (T) array[fim];
+			return (T) array[0];
 		}
 		return null;
 	}
