@@ -105,7 +105,7 @@ public class ArvoreExpressoes {
 					expressao.remove(index + 1);
 					fim--;
 				} else {
-					String operador2 = "";
+					String operador2 = null;
 					boolean tmp = (operadores).contains(expressao.get(index + 1).toString());
 					Object right = index < expressao.size() ? expressao.get(index + 1) : null;
 					if (tmp) {
