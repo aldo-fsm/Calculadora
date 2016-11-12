@@ -188,6 +188,7 @@ public class ArvoreExpressoes {
 		String simbolo;
 		try {
 			boolean isBinary = false;
+			boolean especialOperatorPresent = false;
 			while (!expressao.isEmpty()) {
 				simbolo = expressao.dequeue();
 				if (simbolo.equals("(")) {
@@ -203,6 +204,9 @@ public class ArvoreExpressoes {
 						novoElemento.setElemento(simbolo);
 						pilhaArvores.push(novoElemento);
 						isBinary = true;
+					} else{
+						pilhaOperadores.push(simbolo);
+						especialOperatorPresent = true;
 					}
 				} else if (simbolo.equals(")")) {
 					Node<String> novoElemento = new Node<String>();
@@ -211,18 +215,22 @@ public class ArvoreExpressoes {
 					novoElemento.setLeftNode(pilhaArvores.pop());
 					pilhaArvores.push(novoElemento);
 					isBinary = true;
+					if(especialOperatorPresent){
+						//TODO
+						System.out.println("we still in construction");
+						String especialOperator = pilhaOperadores.pop();
+						Node<String> novoElemento2 = new Node<String>();
+						novoElemento2.setElemento(especialOperator);
+						novoElemento2.setRightNode(pilhaArvores.pop());
+						pilhaArvores.push(novoElemento);
+						especialOperatorPresent = false;
+					}
 				} else {
 					Node<String> nodeAux;
 					nodeAux = new Node<String>(simbolo);
 					pilhaArvores.push(nodeAux);
 					isBinary = true;
 				}
-			}
-			if (!pilhaOperadores.isEmpty()) {
-				Node<String> novoElemento = new Node<String>();
-				novoElemento.setElemento(pilhaOperadores.pop());
-				novoElemento.setRightNode(pilhaArvores.pop());
-				pilhaArvores.push(novoElemento);
 			}
 			adicionarNode(pilhaArvores.pop());
 		} catch (RuntimeException e) {
@@ -299,7 +307,7 @@ public class ArvoreExpressoes {
 				}
 			}
 		}
-		return Racional.ZERO;
+		return null;
 	}
 
 	private void validarExpressao(String expressao) {
