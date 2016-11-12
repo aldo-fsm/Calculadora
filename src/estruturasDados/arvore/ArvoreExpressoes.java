@@ -20,7 +20,7 @@ import numeros.Racional;
 public class ArvoreExpressoes {
 	private Node<String> root;
 	private Scanner scanner;
-	// determina a precisão e o modo de arredondamento
+	// determina a precisÃ£o e o modo de arredondamento
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
 	// operadores em ordem de precedencia
 	private static final String operadores = "^~*%/-+";
@@ -31,10 +31,10 @@ public class ArvoreExpressoes {
 	}
 
 	/**
-	 * Armazena uma expressão infixa na arvore de expressões.
+	 * Armazena uma expressÃ£o infixa na arvore de expressÃµes.
 	 * 
 	 * @param expressao
-	 *            Expressão em notação infixa
+	 *            ExpressÃ£o em notaÃ§Ã£o infixa
 	 */
 	@SuppressWarnings("unchecked")
 	public void armazenarExpressao(String expressao) {
@@ -105,13 +105,24 @@ public class ArvoreExpressoes {
 					expressao.remove(index + 1);
 					fim--;
 				} else {
-					Object left = index > 0 ? expressao.get(index - 1) : null;
+					String operador2 = "";
+					boolean tmp = (operadores).contains(expressao.get(index + 1).toString());
 					Object right = index < expressao.size() ? expressao.get(index + 1) : null;
-					expressao.add(index, listConcat("(", left, operador, right, ")"));
+					if (tmp) {
+						operador2 = expressao.get(index + 1).toString();
+						right = index < expressao.size() ? expressao.get(index + 2) : null;
+					}
+					Object left = index > 0 ? expressao.get(index - 1) : null;
+					expressao.add(index, listConcat("(", left, operador, operador2, right, ")"));
 					expressao.remove(index + 2);
 					expressao.remove(index + 1);
 					expressao.remove(index - 1);
-					fim -= 2;
+					if(tmp){
+						expressao.remove(index);
+						fim -= 3;
+					}else{
+						fim -= 2;						
+					}
 				}
 			} else {
 				i++;
@@ -137,7 +148,7 @@ public class ArvoreExpressoes {
 	// junta caracteres que representam um numero ou variavel em uma string
 	private String extractNumber(String expressao, int inicio) {
 		String numero = expressao.charAt(inicio) + "";
-		// concatena até encontrar parenteses, operadores ou espaço
+		// concatena atÃ© encontrar parenteses, operadores ou espaÃ§o
 		for (int i = inicio + 1; i < expressao.length(); i++) {
 			if ((operadores + "( )").contains(expressao.charAt(i) + ""))
 				break;
@@ -180,44 +191,31 @@ public class ArvoreExpressoes {
 			while (!expressao.isEmpty()) {
 				simbolo = expressao.dequeue();
 				if (simbolo.equals("(")) {
-					if (!isBinary) {
-						// pilhaOperadores.push(pilhaOperadores.pop() + "(");
-					}
 					isBinary = false;
 					continue;
 				} else if (operadores.contains(simbolo)) {
 					if (isBinary) {
 						pilhaOperadores.push(simbolo);
-					} else {
-						if ("0123456789".contains(expressao.peek())) {
-							pilhaOperadores.push(simbolo + expressao.dequeue());
-						} else {
-//							pilhaOperadores.push(simbolo + "u");
-						}
+						isBinary = false;
+					} else if ("0123456789".contains(expressao.peek())) {
+						Node<String> novoElemento = new Node<String>();
+						simbolo += expressao.dequeue();
+						novoElemento.setElemento(simbolo);
+						pilhaArvores.push(novoElemento);
 						isBinary = true;
 					}
 				} else if (simbolo.equals(")")) {
 					Node<String> novoElemento = new Node<String>();
 					novoElemento.setElemento(pilhaOperadores.pop());
-					// if (novoElemento.getElemento().contains("u")) {
-					// novoElemento.setRightNode(pilhaArvores.pop());
-					// pilhaArvores.push(novoElemento);
-					// } else {
 					novoElemento.setRightNode(pilhaArvores.pop());
 					novoElemento.setLeftNode(pilhaArvores.pop());
 					pilhaArvores.push(novoElemento);
-					// }
 					isBinary = true;
 				} else {
 					Node<String> nodeAux;
-					// if (isBinary) {
 					nodeAux = new Node<String>(simbolo);
-					// } else {
-					// nodeAux = new Node<String>(pilhaOperadores.pop() +
-					// simbolo);
-					// }
-					isBinary = true;
 					pilhaArvores.push(nodeAux);
+					isBinary = true;
 				}
 			}
 			if (!pilhaOperadores.isEmpty()) {
@@ -260,8 +258,8 @@ public class ArvoreExpressoes {
 		if (raiz != null) {
 			if (root != null) {
 				if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
-					String numeros = "-0123456789";
-					if (numeros.indexOf(raiz.getElemento().charAt(0)) == -1) {
+					String numOper = "0123456789" + operadores;
+					if (numOper.indexOf(raiz.getElemento().charAt(0)) == -1) {
 						if (variaveis.contem(raiz.getElemento().charAt(0) + "")) {
 							return valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + ""));
 						} else {
@@ -346,8 +344,8 @@ public class ArvoreExpressoes {
 			if (raiz.getElemento() != "") {
 				auxInformaVariaveis(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
 				if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
-					String numeros = "-0123456789";
-					if (numeros.indexOf(raiz.getElemento().charAt(0)) == -1) {
+					String numOperador = "0123456789" + operadores;
+					if (numOperador.indexOf(raiz.getElemento().charAt(0)) == -1) {
 						if (variaveis.contem(raiz.getElemento().charAt(0) + "")) {
 							raiz.setElemento(
 									valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + "")));
@@ -367,7 +365,7 @@ public class ArvoreExpressoes {
 
 	}
 
-	// calcula a raiz de indice indice usando o método de newton
+	// calcula a raiz de indice indice usando o mÃ©todo de newton
 	private BigDecimal raiz(BigDecimal valor, int indice) {
 
 		if (valor.compareTo(BigDecimal.ZERO) < 0 && indice % 2 == 0) {
@@ -393,7 +391,7 @@ public class ArvoreExpressoes {
 		while (!fatores.isEmpty()) {
 			indice = fatores.dequeue();
 
-			// aproximação inicial
+			// aproximaÃ§Ã£o inicial
 			BigDecimal resultado = BigDecimal.ONE;
 			BigDecimal auxResultado = resultado;
 
