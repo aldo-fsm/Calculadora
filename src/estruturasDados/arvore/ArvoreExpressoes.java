@@ -40,9 +40,8 @@ public class ArvoreExpressoes {
 	public void armazenarExpressao(String expressao) {
 
 		validarExpressao(expressao);
-
-		ArrayList<Object> lista = new ArrayList<Object>();
 		expressao = "(" + expressao + ")";
+		ArrayList<Object> lista = new ArrayList<Object>();
 
 		// coloca cada simbolo numa lista, agrupando numeros e nomes de
 		// variaveis em strings
@@ -198,15 +197,15 @@ public class ArvoreExpressoes {
 					if (isBinary) {
 						pilhaOperadores.push(simbolo);
 						isBinary = false;
-					} else if(!"()".contains(expressao.peek())){
+					} else if (!"()".contains(expressao.peek())) {
 						Node<String> novoElemento = new Node<String>();
 						novoElemento.setElemento(simbolo);
 						Node<String> newRightElement = new Node<String>();
 						newRightElement.setElemento(expressao.dequeue());
 						novoElemento.setRightNode(newRightElement);
 						pilhaArvores.push(novoElemento);
-						isBinary = true;						
-					}else{
+						isBinary = true;
+					} else {
 						pilhaOperadores.push(simbolo);
 						especialOperatorPresent = true;
 					}
@@ -283,6 +282,9 @@ public class ArvoreExpressoes {
 				}
 				Racional expressao1 = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
 				Racional expressao2 = auxCalcularExpressao(raiz.getRightNode(), variaveis, valoresCorrespondentes);
+				if(expressao1 == null && !(raiz.getElemento().equals("-")||raiz.getElemento().equals("+"))){
+					throw new ExpressaoMalFormadaException("Operador " + raiz.getElemento() + " nao possui interpretacao unaria");
+				}
 				switch (raiz.getElemento()) {
 				case "*":
 					return expressao1.multiplicar(expressao2);
@@ -328,6 +330,8 @@ public class ArvoreExpressoes {
 				} else if (expressao.charAt(i) == ')') {
 					if (j >= i - 1) {
 						expressaoInvalida = true;
+						j++;
+						break;
 					}
 					pilha.pop();
 				}
