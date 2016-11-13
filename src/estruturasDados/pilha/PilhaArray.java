@@ -27,7 +27,7 @@ public class PilhaArray<T> implements Pilha<T> {
 	public T pop() {
 
 		if (topo == -1) {
-			return null;
+			throw new ArrayIndexOutOfBoundsException();
 		} else {
 			T retorno = (T) array[topo];
 			array[topo--] = null;
