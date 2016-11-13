@@ -31,10 +31,10 @@ public class ArvoreExpressoes {
 	}
 
 	/**
-	 * Armazena uma expressÃ£o infixa na arvore de expressÃµes.
+	 * Armazena uma expressÃƒÂ£o infixa na arvore de expressÃƒÂµes.
 	 * 
 	 * @param expressao
-	 *            ExpressÃ£o em notaÃ§Ã£o infixa
+	 *            ExpressÃƒÂ£o em notaÃƒÂ§ÃƒÂ£o infixa
 	 */
 	@SuppressWarnings("unchecked")
 	public void armazenarExpressao(String expressao) {
@@ -148,7 +148,7 @@ public class ArvoreExpressoes {
 	// junta caracteres que representam um numero ou variavel em uma string
 	private String extractNumber(String expressao, int inicio) {
 		String numero = expressao.charAt(inicio) + "";
-		// concatena atÃ© encontrar parenteses, operadores ou espaÃ§o
+		// concatena atÃƒÂ© encontrar parenteses, operadores ou espaÃƒÂ§o
 		for (int i = inicio + 1; i < expressao.length(); i++) {
 			if ((operadores + "( )").contains(expressao.charAt(i) + ""))
 				break;
@@ -198,13 +198,15 @@ public class ArvoreExpressoes {
 					if (isBinary) {
 						pilhaOperadores.push(simbolo);
 						isBinary = false;
-					} else if ("0123456789".contains(expressao.peek())) {
+					} else if(!"()".contains(expressao.peek())){
 						Node<String> novoElemento = new Node<String>();
-						simbolo += expressao.dequeue();
 						novoElemento.setElemento(simbolo);
+						Node<String> newRightElement = new Node<String>();
+						newRightElement.setElemento(expressao.dequeue());
+						novoElemento.setRightNode(newRightElement);
 						pilhaArvores.push(novoElemento);
-						isBinary = true;
-					} else {
+						isBinary = true;						
+					}else{
 						pilhaOperadores.push(simbolo);
 						especialOperatorPresent = true;
 					}
@@ -375,7 +377,7 @@ public class ArvoreExpressoes {
 
 	}
 
-	// calcula a raiz de indice indice usando o mÃ©todo de newton
+	// calcula a raiz de indice indice usando o mÃƒÂ©todo de newton
 	private BigDecimal raiz(BigDecimal valor, int indice) {
 
 		if (valor.compareTo(BigDecimal.ZERO) < 0 && indice % 2 == 0) {
@@ -401,7 +403,7 @@ public class ArvoreExpressoes {
 		while (!fatores.isEmpty()) {
 			indice = fatores.dequeue();
 
-			// aproximaÃ§Ã£o inicial
+			// aproximaÃƒÂ§ÃƒÂ£o inicial
 			BigDecimal resultado = BigDecimal.ONE;
 			BigDecimal auxResultado = resultado;
 
