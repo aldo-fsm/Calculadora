@@ -346,7 +346,7 @@ public class ArvoreExpressoes {
 		if (expressaoInvalida) {
 			String indicadorErro = "";
 			int procuraErro = 0;
-			while (procuraErro < posicaoErro) {
+			while (procuraErro -64 < posicaoErro) {
 				indicadorErro += " ";
 				procuraErro++;
 			}
