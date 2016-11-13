@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
-
 import estruturasDados.fila.Fila;
 import estruturasDados.fila.FilaArray;
 import estruturasDados.lista.Lista;
@@ -95,7 +94,8 @@ public class ArvoreExpressoes {
 		while (i < operadores.length()) {
 			char operador = operadores.charAt(i);
 			List<Object> subExpressao = expressao.subList(inicio, fim);
-			int index = inicio + subExpressao.indexOf(operador + "");
+			int index = "^~/".contains(operador + "") ? inicio + subExpressao.lastIndexOf(operador + "")
+					: inicio + subExpressao.indexOf(operador + "");
 			if (index >= inicio && index < fim) {
 				isNotBinary = index == inicio || (operadores + "(").contains(expressao.get(index - 1).toString());
 				if (isNotBinary) {
@@ -130,6 +130,7 @@ public class ArvoreExpressoes {
 	}
 
 	// concatena objetos em uma lista.
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private ArrayList listConcat(Object... objects) {
 		ArrayList lista = new ArrayList();
 		for (Object object : objects) {
@@ -235,7 +236,6 @@ public class ArvoreExpressoes {
 		} catch (RuntimeException e) {
 			throw new ExpressaoMalFormadaException();
 		}
-
 	}
 
 	private String auxExpressaoEmOrdem(Node<String> node) {
@@ -282,8 +282,9 @@ public class ArvoreExpressoes {
 				}
 				Racional expressao1 = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
 				Racional expressao2 = auxCalcularExpressao(raiz.getRightNode(), variaveis, valoresCorrespondentes);
-				if(expressao1 == null && !(raiz.getElemento().equals("-")||raiz.getElemento().equals("+"))){
-					throw new ExpressaoMalFormadaException("Operador " + raiz.getElemento() + " nao possui interpretacao unaria");
+				if (expressao1 == null && !(raiz.getElemento().equals("-") || raiz.getElemento().equals("+"))) {
+					throw new ExpressaoMalFormadaException(
+							"Operador " + raiz.getElemento() + " nao possui interpretacao unaria");
 				}
 				switch (raiz.getElemento()) {
 				case "*":
@@ -346,7 +347,7 @@ public class ArvoreExpressoes {
 		if (expressaoInvalida) {
 			String indicadorErro = "";
 			int procuraErro = 0;
-			while (procuraErro -64 < posicaoErro) {
+			while (procuraErro - 64 < posicaoErro) {
 				indicadorErro += " ";
 				procuraErro++;
 			}
