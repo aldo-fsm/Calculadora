@@ -257,6 +257,8 @@ public class ArvoreExpressoes {
 				especialOperator = false;
 			}
 		}
+		if(!operators.isEmpty())
+			throw new ExpressaoMalFormadaException("Existem operadores sobrando");
 		// a arvore de expressao criada e deve ser a atual, logo se adiciona o
 		// node guardado na pilha de subExpressoes na Arvore de Expressoes
 		adicionarNode(subExpres.pop());
