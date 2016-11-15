@@ -9,7 +9,7 @@ public class TesteCalculoExpressoes {
 		ArvoreExpressoes calculadora = new ArvoreExpressoes();
 		System.out.println("\n\t- Teste - Calculadora de Expressões -\n");
 		System.out.println("- digite exit para sair");
-		System.out.println("- digite acrescentar para acrescentar a uma expressao previamente incluida");
+		System.out.println("- digite & para acrescentar a uma expressao previamente incluida");
 		System.out.println("- digite precisao para mudar a precisao");
 		System.out.println("\n");
 
@@ -22,7 +22,7 @@ public class TesteCalculoExpressoes {
 				switch (input) {
 				case "":
 					continue;
-				case "acrescentar":
+				case "&":
 					System.out.println("digite a expressao a ser acrescentada sem parenteses");
 					System.out.printf(">>> ");
 					input = s.nextLine();
