@@ -35,7 +35,7 @@ public class ArvoreExpressoes {
 	 * 
 	 * @param expressao
 	 *            ExpressÃƒÂ£o em notaÃƒÂ§ÃƒÂ£o infixa
-	 */
+	 */ 
 	@SuppressWarnings("unchecked")
 	public void armazenarExpressao(String expressao) {
 
