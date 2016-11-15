@@ -183,7 +183,7 @@ public class ArvoreExpressoes {
 
 	private void tradutorDeExpressoes(Fila<String> expressao) {
 		root = null;
-		// pilhas de operadores e de expressoes (arvores) que iram servir para
+		// pilhas de operadores e de expressoes (arvores) que irao servir para
 		// costruir a arvore de expressao
 		Pilha<String> operators = new PilhaArray<String>();
 		Pilha<Node<String>> subExpres = new PilhaArray<Node<String>>();
