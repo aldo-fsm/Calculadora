@@ -23,25 +23,22 @@ public class ArvoreExpressoes {
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
 	// operadores em ordem de precedencia
 	private static final String operadores = "^~*%/-+";
-
+	
 	public void acrescentaNaExpressao(String expressao) {
 		expressao = "(" + expressaoEmOrdem() + expressao + ")";
 		armazenarExpressao(expressao);
 	}
-
 	/**
 	 * Armazena uma expressÃƒÂ£o infixa na arvore de expressÃƒÂµes.
 	 * 
 	 * @param expressao
-	 *            ExpressÃƒÂ£o em notaÃƒÂ§ÃƒÂ£o infixa
+	 *            Expressão em notação infixa
 	 */
 	@SuppressWarnings("unchecked")
 	public void armazenarExpressao(String expressao) {
-
 		validarExpressao(expressao);
 		expressao = "(" + expressao + ")";
 		ArrayList<Object> lista = new ArrayList<Object>();
-
 		// coloca cada simbolo numa lista, agrupando numeros e nomes de
 		// variaveis em strings
 		for (int i = 0; i < expressao.length(); i++) {
@@ -61,16 +58,20 @@ public class ArvoreExpressoes {
 			}
 		}
 		// loop para adicionar parenteses
-		while (lista.size() > 1) {
-			int fim = lista.indexOf(")");
-			int inicio;
-			for (inicio = fim; inicio > 0; inicio--) {
-				if (lista.get(inicio).equals("("))
-					break;
+		try {
+			while (lista.size() > 1) {
+				int fim = lista.indexOf(")");
+				int inicio;
+				for (inicio = fim; inicio > 0; inicio--) {
+					if (lista.get(inicio).equals("("))
+						break;
+				}
+				lista.remove(inicio);
+				lista.remove(fim - 1);
+				adicionarParenteses(lista, inicio, fim - 1);
 			}
-			lista.remove(inicio);
-			lista.remove(fim - 1);
-			adicionarParenteses(lista, inicio, fim - 1);
+		} catch (RuntimeException e) {
+			throw new ExpressaoMalFormadaException();
 		}
 		Fila<String> fila = new FilaArray<String>();
 		if (lista.get(0) instanceof ArrayList) {
@@ -83,7 +84,6 @@ public class ArvoreExpressoes {
 		for (int i = 0; i < lista.size(); i++) {
 			fila.enqueue(lista.get(i).toString());
 		}
-
 		tradutorDeExpressoes(fila);
 	}
 
@@ -155,7 +155,6 @@ public class ArvoreExpressoes {
 			numero += expressao.charAt(i);
 		}
 		return numero;
-
 	}
 
 	public String expressaoEmOrdem() {
@@ -404,18 +403,15 @@ public class ArvoreExpressoes {
 				auxInformaVariaveis(raiz.getRightNode(), variaveis, valoresCorrespondentes);
 			}
 		}
-
 	}
 
-	// calcula a raiz de indice indice usando o mÃƒÂ©todo de newton
+	// calcula a raiz de indice indice usando o metodo de newton
 	private BigDecimal raiz(BigDecimal valor, int indice) {
-
 		if (valor.compareTo(BigDecimal.ZERO) < 0 && indice % 2 == 0) {
 			throw new ArithmeticException("raiz par de numero negativo");
 		} else if (indice == 1) {
 			return valor;
 		}
-
 		Fila<Integer> fatores = new FilaArray<Integer>();
 		int i = 2;
 		while (indice >= i) {
@@ -425,22 +421,17 @@ public class ArvoreExpressoes {
 			}
 			i++;
 		}
-
 		int precisao = mathContext.getPrecision();
 		RoundingMode roundingMode = mathContext.getRoundingMode();
 		MathContext tempMathContext = new MathContext(precisao + 5, roundingMode);
-
 		while (!fatores.isEmpty()) {
 			indice = fatores.dequeue();
-
-			// aproximaÃƒÂ§ÃƒÂ£o inicial
+			// aproximação inicial
 			BigDecimal resultado = BigDecimal.ONE;
 			BigDecimal auxResultado = resultado;
-
 			int lastCorrectDigit = -1;
 			BigDecimal k1 = (BigDecimal.ONE).divide(BigDecimal.valueOf(indice), tempMathContext);
 			int k2 = indice - 1;
-
 			do {
 				resultado = k1.multiply(resultado.multiply(BigDecimal.valueOf(k2))
 						.add(valor.divide(resultado.pow(k2), tempMathContext)));
@@ -463,5 +454,4 @@ public class ArvoreExpressoes {
 		}
 		return i;
 	}
-
 }
