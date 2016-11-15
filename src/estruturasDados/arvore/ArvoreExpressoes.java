@@ -1,4 +1,3 @@
-
 package estruturasDados.arvore;
 
 import java.math.BigDecimal;
@@ -35,7 +34,7 @@ public class ArvoreExpressoes {
 	 * 
 	 * @param expressao
 	 *            ExpressÃƒÂ£o em notaÃƒÂ§ÃƒÂ£o infixa
-	 */ 
+	 */
 	@SuppressWarnings("unchecked")
 	public void armazenarExpressao(String expressao) {
 
@@ -188,21 +187,22 @@ public class ArvoreExpressoes {
 		Pilha<Node<String>> subExpres = new PilhaArray<Node<String>>();
 		String termo;
 		String operadorEspecial = null;
-		Node<String> maisQueEspecial = new Node<String>();
+		List<Node<String>> maisQueEspecial = new ArrayList<Node<String>>();
 		boolean especialOperator = true;
-		int nivel = 0;
+		List<Integer> niveis = new ArrayList<Integer>();
 		while (!expressao.isEmpty()) {
 			termo = expressao.dequeue();
 			// caso seja um parenteses abrindo
 			if (termo.equals("(")) {
 				if (operadorEspecial != null) {
-					maisQueEspecial.setElemento(operadorEspecial);
+					maisQueEspecial.add(new Node<String>(operadorEspecial));
+					niveis.add(0);
 					operadorEspecial = null;
 				}
-				if (maisQueEspecial.getElemento() != null) {
-					nivel++;
-					System.out.println(nivel);
-				}
+				for (int i = 0; i < maisQueEspecial.size(); i++)
+					if (maisQueEspecial.get(i).getElemento() != null) {
+						niveis.set(i, niveis.get(i) + 1);
+					}
 				especialOperator = true;
 				// caso seja um operador
 			} else if (operadores.contains(termo)) {
@@ -220,14 +220,18 @@ public class ArvoreExpressoes {
 				Node<String> subExpressaoAux = new Node<String>(operators.pop());
 				subExpressaoAux.setRightNode(subExpres.pop());
 				subExpressaoAux.setLeftNode(subExpres.pop());
-				if (maisQueEspecial.getElemento() != null) {
-					nivel--;
-					System.out.println(nivel);
-					if (nivel == 0) {
-						maisQueEspecial.setRightNode(subExpressaoAux);
-						subExpres.push(maisQueEspecial);
-						maisQueEspecial = new Node<String>(null);
-					} else
+				if (!maisQueEspecial.isEmpty()) {
+					boolean entrou = false;
+					for (int i = 0; i < maisQueEspecial.size(); i++) {
+						niveis.set(i, niveis.get(i) - 1);
+						if (niveis.get(i) == 0) {
+							maisQueEspecial.get(i).setRightNode(subExpressaoAux);
+							subExpres.push(maisQueEspecial.get(i));
+							maisQueEspecial.set(i, new Node<String>(null));
+							entrou = true;
+						}
+					}
+					if (!entrou)
 						subExpres.push(subExpressaoAux);
 				} else
 					subExpres.push(subExpressaoAux);
