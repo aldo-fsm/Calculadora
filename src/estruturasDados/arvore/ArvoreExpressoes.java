@@ -183,13 +183,21 @@ public class ArvoreExpressoes {
 
 	private void tradutorDeExpressoes(Fila<String> expressao) {
 		root = null;
+		// pilhas de operadores e de expressoes (arvores) que iram servir para
+		// costruir a arvore de expressao
 		Pilha<String> operators = new PilhaArray<String>();
 		Pilha<Node<String>> subExpres = new PilhaArray<Node<String>>();
+		// termo e a string que representara o simbolo a medida que se anda na
+		// fila
 		String termo;
+		// cotroladores de sinais para compreensao de expressoes com inumeras
+		// subexpressoes negativas
 		String operadorEspecial = null;
-		List<Node<String>> maisQueEspecial = new ArrayList<Node<String>>();
 		boolean especialOperator = true;
+		List<Node<String>> maisQueEspecial = new ArrayList<Node<String>>();
 		List<Integer> niveis = new ArrayList<Integer>();
+		// loop de leitura da fila e modificacao e criacao da arvore de
+		// expressao
 		while (!expressao.isEmpty()) {
 			termo = expressao.dequeue();
 			// caso seja um parenteses abrindo
@@ -250,6 +258,8 @@ public class ArvoreExpressoes {
 				especialOperator = false;
 			}
 		}
+		// a arvore de expressao criada e deve ser a atual, logo se adiciona o
+		// node guardado na pilha de subExpressoes na Arvore de Expressoes
 		adicionarNode(subExpres.pop());
 	}
 
