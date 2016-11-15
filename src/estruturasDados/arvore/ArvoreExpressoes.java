@@ -1,3 +1,4 @@
+
 package estruturasDados.arvore;
 
 import java.math.BigDecimal;
@@ -183,59 +184,69 @@ public class ArvoreExpressoes {
 
 	private void tradutorDeExpressoes(Fila<String> expressao) {
 		root = null;
-		Pilha<String> pilhaOperadores = new PilhaArray<String>();
-		Pilha<Node<String>> pilhaArvores = new PilhaArray<Node<String>>();
-		String simbolo;
-		try {
-			boolean isBinary = false;
-			boolean especialOperatorPresent = false;
-			while (!expressao.isEmpty()) {
-				simbolo = expressao.dequeue();
-				if (simbolo.equals("(")) {
-					isBinary = false;
-					continue;
-				} else if (operadores.contains(simbolo)) {
-					if (isBinary) {
-						pilhaOperadores.push(simbolo);
-						isBinary = false;
-					} else if (!"()".contains(expressao.peek())) {
-						Node<String> novoElemento = new Node<String>();
-						novoElemento.setElemento(simbolo);
-						Node<String> newRightElement = new Node<String>();
-						newRightElement.setElemento(expressao.dequeue());
-						novoElemento.setRightNode(newRightElement);
-						pilhaArvores.push(novoElemento);
-						isBinary = true;
-					} else {
-						pilhaOperadores.push(simbolo);
-						especialOperatorPresent = true;
-					}
-				} else if (simbolo.equals(")")) {
-					Node<String> novoElemento = new Node<String>();
-					novoElemento.setElemento(pilhaOperadores.pop());
-					novoElemento.setRightNode(pilhaArvores.pop());
-					novoElemento.setLeftNode(pilhaArvores.pop());
-					pilhaArvores.push(novoElemento);
-					isBinary = true;
-					if (especialOperatorPresent) {
-						String especialOperator = pilhaOperadores.pop();
-						Node<String> novoElemento2 = new Node<String>();
-						novoElemento2.setElemento(especialOperator);
-						novoElemento2.setRightNode(pilhaArvores.pop());
-						pilhaArvores.push(novoElemento2);
-						especialOperatorPresent = false;
-					}
-				} else {
-					Node<String> nodeAux;
-					nodeAux = new Node<String>(simbolo);
-					pilhaArvores.push(nodeAux);
-					isBinary = true;
+		Pilha<String> operators = new PilhaArray<String>();
+		Pilha<Node<String>> subExpres = new PilhaArray<Node<String>>();
+		String termo;
+		String operadorEspecial = null;
+		Node<String> maisQueEspecial = new Node<String>();
+		boolean especialOperator = true;
+		int nivel = 0;
+		while (!expressao.isEmpty()) {
+			termo = expressao.dequeue();
+			// caso seja um parenteses abrindo
+			if (termo.equals("(")) {
+				if (operadorEspecial != null) {
+					maisQueEspecial.setElemento(operadorEspecial);
+					operadorEspecial = null;
 				}
+				if (maisQueEspecial.getElemento() != null) {
+					nivel++;
+					System.out.println(nivel);
+				}
+				especialOperator = true;
+				// caso seja um operador
+			} else if (operadores.contains(termo)) {
+				if (especialOperator) {
+					operadorEspecial = termo;
+					// todo e qualquer operador apos o especial deve ser um
+					// operador normal (por hora)
+					especialOperator = false;
+				} else {
+					operators.push(termo);
+					especialOperator = true;
+				}
+				// caso seja um parenteses fechando
+			} else if (termo.equals(")")) {
+				Node<String> subExpressaoAux = new Node<String>(operators.pop());
+				subExpressaoAux.setRightNode(subExpres.pop());
+				subExpressaoAux.setLeftNode(subExpres.pop());
+				if (maisQueEspecial.getElemento() != null) {
+					nivel--;
+					System.out.println(nivel);
+					if (nivel == 0) {
+						maisQueEspecial.setRightNode(subExpressaoAux);
+						subExpres.push(maisQueEspecial);
+						maisQueEspecial = new Node<String>(null);
+					} else
+						subExpres.push(subExpressaoAux);
+				} else
+					subExpres.push(subExpressaoAux);
+				especialOperator = false;
+				// caso seja um valor (numero ou variavel)
+			} else {
+				Node<String> valor = new Node<String>();
+				if (operadorEspecial != null) {
+					valor.setElemento(operadorEspecial);
+					valor.setRightNode(new Node<String>(termo));
+					operadorEspecial = null;
+				} else {
+					valor.setElemento(termo);
+				}
+				subExpres.push(valor);
+				especialOperator = false;
 			}
-			adicionarNode(pilhaArvores.pop());
-		} catch (RuntimeException e) {
-			throw new ExpressaoMalFormadaException();
 		}
+		adicionarNode(subExpres.pop());
 	}
 
 	private String auxExpressaoEmOrdem(Node<String> node) {
