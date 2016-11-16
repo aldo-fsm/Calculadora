@@ -71,6 +71,7 @@ public class ListaArray<T> implements Lista<T> {
 		size--;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public T get(int posicao) {
 		return (T) elementos[posicao];

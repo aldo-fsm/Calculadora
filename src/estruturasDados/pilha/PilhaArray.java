@@ -23,9 +23,9 @@ public class PilhaArray<T> implements Pilha<T> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public T pop() {
-
 		if (topo == -1) {
 			throw new ArrayIndexOutOfBoundsException();
 		} else {

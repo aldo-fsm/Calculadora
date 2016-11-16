@@ -1,7 +1,5 @@
 package estruturasDados.fila;
 
-import java.util.List;
-
 import estruturasDados.lista.ListaArray;
 
 public class FilaArray<T> implements Fila<T> {
@@ -32,6 +30,7 @@ public class FilaArray<T> implements Fila<T> {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public T dequeue() {
 
@@ -81,6 +80,7 @@ public class FilaArray<T> implements Fila<T> {
 		array = novoArray;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public T peek() {
 		if (fim > -1) {
