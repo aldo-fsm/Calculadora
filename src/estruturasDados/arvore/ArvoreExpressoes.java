@@ -185,6 +185,11 @@ public class ArvoreExpressoes {
 		auxInformaVariaveis(root, variaveis, valoresCorrespondentes);
 	}
 
+	/**
+	 * calcula o valor da expressao
+	 * 
+	 * @return O resultado da expressao
+	 */
 	public Racional calcularExpressao() {
 		Racional.setBigDecimalConversionPrecision(mathContext.getPrecision());
 		if (root.getLeftNode() == null && root.getRightNode() == null)
@@ -194,11 +199,19 @@ public class ArvoreExpressoes {
 		return auxCalcularExpressao(root, variaveis, valoresCorrespondentes);
 	}
 
+	/**
+	 * Determina a precisao da calculadora
+	 * 
+	 * @param precision
+	 */
 	public void setPrecision(int precision) {
 		mathContext = new MathContext(precision, mathContext.getRoundingMode());
 	}
 
+	// converte uma fila de simbolos(parenteses, operadores, valores e
+	// variaveis) em uma arvore de expressaoes
 	private void tradutorDeExpressoes(Fila<String> expressao) {
+
 		root = null;
 		// pilhas de operadores e de expressoes (arvores) que irao servir para
 		// costruir a arvore de expressao
@@ -282,6 +295,7 @@ public class ArvoreExpressoes {
 		adicionarNode(subExpres.pop());
 	}
 
+	// metodo recursivo para percusso em ordem
 	private String auxExpressaoEmOrdem(Node<String> node) {
 		if (node != null) {
 			if (node.getLeftNode() == null && node.getRightNode() == null) {
