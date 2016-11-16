@@ -12,6 +12,7 @@ public class Racional extends Number implements Comparable<Racional> {
 
 	private BigInteger numerador;
 	private BigInteger denominador;
+	// precisao para a divisao numerador/denominador
 	private static int bigDecimalConversionPrecision = 10;
 
 	public static final Racional ZERO = new Racional("0");
@@ -63,6 +64,7 @@ public class Racional extends Number implements Comparable<Racional> {
 		denominador = denominador.divide(mdc);
 	}
 
+	// retorna a soma deste racional com outro
 	public Racional somar(Racional outro) {
 		BigInteger a = outro.getNumerador();
 		BigInteger b = outro.getDenominador();
@@ -75,6 +77,7 @@ public class Racional extends Number implements Comparable<Racional> {
 		return resultado;
 	}
 
+	// retorna a diferenca entre este racional e outro
 	public Racional subtrair(Racional outro) {
 		BigInteger a = outro.getNumerador();
 		BigInteger b = outro.getDenominador();
@@ -87,6 +90,7 @@ public class Racional extends Number implements Comparable<Racional> {
 		return resultado;
 	}
 
+	// retorna o produto entre este racional e outro
 	public Racional multiplicar(Racional outro) {
 		BigInteger a = outro.getNumerador();
 		BigInteger b = outro.getDenominador();
@@ -99,6 +103,7 @@ public class Racional extends Number implements Comparable<Racional> {
 		return resultado;
 	}
 
+	// retorna a divisao entre esse racional e outro
 	public Racional dividir(Racional outro) {
 		BigInteger a = outro.getNumerador();
 
@@ -115,6 +120,7 @@ public class Racional extends Number implements Comparable<Racional> {
 		return resultado;
 	}
 
+	// retorna o inverso deste racional
 	public Racional inverso() {
 		if (numerador.equals(BigInteger.ZERO))
 			throw new ArithmeticException("divisão por zero");
@@ -124,6 +130,7 @@ public class Racional extends Number implements Comparable<Racional> {
 		return resultado;
 	}
 
+	// retorna este racional elevado a uma potencia inteira
 	public Racional pow(int potencia) {
 		if (potencia < 0) {
 			return this.inverso().pow(-potencia);
@@ -155,6 +162,7 @@ public class Racional extends Number implements Comparable<Racional> {
 		}
 	}
 
+	// minimo multiplo comum
 	private BigInteger mmc(BigInteger a, BigInteger b) {
 		if (a.equals(ZERO) && b.equals(ZERO))
 			return BigInteger.ZERO;
@@ -163,6 +171,7 @@ public class Racional extends Number implements Comparable<Racional> {
 		}
 	}
 
+	// converte para BigDecimal
 	public BigDecimal bigDecimalValue(int precision) {
 		BigDecimal numerador = new BigDecimal(this.numerador);
 		BigDecimal denominador = new BigDecimal(this.denominador);
@@ -170,19 +179,23 @@ public class Racional extends Number implements Comparable<Racional> {
 		return numerador.divide(denominador, m).stripTrailingZeros();
 	}
 
+	// converte para BigDecimal usando a precisao padrao
 	public BigDecimal bigDecimalValue() {
 		return bigDecimalValue(bigDecimalConversionPrecision);
 	}
 
+	// convere para BigInteger
 	public BigInteger bigIntegerValue() {
 		return numerador.divide(denominador);
 	}
 
+	// retorna o resto da divisao deste racional por outro
 	public Racional resto(Racional divisor) {
 		Racional divisaoInteira = new Racional(this.dividir(divisor).bigIntegerValue(), BigInteger.ONE);
 		return this.subtrair(divisaoInteira.multiplicar(divisor));
 	}
 
+	// retorna o valor absoluto deste racional
 	public Racional abs() {
 		Racional resultado = new Racional();
 		resultado.numerador = numerador.abs();
@@ -198,6 +211,22 @@ public class Racional extends Number implements Comparable<Racional> {
 		return new Racional(numero.toString());
 	}
 
+	public static int getBigDecimalConversionPrecision() {
+		return bigDecimalConversionPrecision;
+	}
+
+	public static void setBigDecimalConversionPrecision(int precision) {
+		bigDecimalConversionPrecision = precision;
+	}
+
+	public BigInteger getNumerador() {
+		return numerador;
+	}
+
+	public BigInteger getDenominador() {
+		return denominador;
+	}
+
 	@Override
 	public String toString() {
 		return bigDecimalValue().toString();
@@ -208,38 +237,19 @@ public class Racional extends Number implements Comparable<Racional> {
 		return numerador.divide(denominador).intValue();
 	}
 
-	public static int getBigDecimalConversionPrecision() {
-		return bigDecimalConversionPrecision;
-	}
-
-	public static void setBigDecimalConversionPrecision(int precision) {
-		bigDecimalConversionPrecision = precision;
-	}
-
 	@Override
 	public long longValue() {
-		// TODO Auto-generated method stub
-		return 0;
+		return numerador.divide(denominador).longValue();
 	}
 
 	@Override
 	public float floatValue() {
-		// TODO Auto-generated method stub
-		return 0;
+		return bigDecimalValue().floatValue();
 	}
 
 	@Override
 	public double doubleValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public BigInteger getNumerador() {
-		return numerador;
-	}
-
-	public BigInteger getDenominador() {
-		return denominador;
+		return bigDecimalValue().doubleValue();
 	}
 
 	@Override
