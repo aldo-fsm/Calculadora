@@ -443,6 +443,10 @@ public class ArvoreExpressoes {
 	// calcula a raiz de indice indice usando o metodo de newton
 	private BigDecimal raiz(BigDecimal valor, int indice) {
 		boolean negativo = false;
+		if (indice < 0) {
+			valor = BigDecimal.ONE.divide(valor);
+			indice = -indice;
+		}
 		if (valor.compareTo(BigDecimal.ZERO) < 0)
 			negativo = true;
 		if (negativo && indice % 2 == 0) {
