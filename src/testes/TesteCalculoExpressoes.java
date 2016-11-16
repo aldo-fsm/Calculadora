@@ -22,7 +22,7 @@ public class TesteCalculoExpressoes {
 				switch (input) {
 				case "":
 					continue;
-				case "&":
+				case "acrescentar":
 					System.out.println("digite a expressao a ser acrescentada sem parenteses");
 					System.out.printf(">>> ");
 					input = s.nextLine();

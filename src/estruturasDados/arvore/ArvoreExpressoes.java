@@ -17,31 +17,48 @@ import exceptions.ExpressaoMalFormadaException;
 import numeros.Racional;
 
 public class ArvoreExpressoes {
+	// raiz da arvore de expressoes
 	private Node<String> root;
 	private Scanner scanner;
 	// determina a precisao e o modo de arredondamento
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
 	// operadores em ordem de precedencia
 	private static final String operadores = "^~*%/-+";
-	
+
+	/**
+	 * acrescenta uma expressao exemplo: ((2*3)+5) acrescentar *3 + 5 =>
+	 * ((((2*3)+5)*3)+5)
+	 * 
+	 * @param expressao
+	 *            expressao a ser acrescentada
+	 */
 	public void acrescentaNaExpressao(String expressao) {
 		expressao = "(" + expressaoEmOrdem() + expressao + ")";
 		armazenarExpressao(expressao);
 	}
+
 	/**
-	 * Armazena uma expressÃƒÂ£o infixa na arvore de expressÃƒÂµes.
+	 * Armazena uma expressão infixa na arvore de expressões.
 	 * 
 	 * @param expressao
 	 *            Expressão em notação infixa
 	 */
 	@SuppressWarnings("unchecked")
 	public void armazenarExpressao(String expressao) {
+
+		// verifica se a expressao esta escrita corretamente
 		validarExpressao(expressao);
+
 		expressao = "(" + expressao + ")";
+
+		// lista de simbolos
 		ArrayList<Object> lista = new ArrayList<Object>();
+
 		// coloca cada simbolo numa lista, agrupando numeros e nomes de
 		// variaveis em strings
 		for (int i = 0; i < expressao.length(); i++) {
+
+			// ignora espaços
 			if (expressao.charAt(i) == ' ') {
 				continue;
 				// se for parenteses
@@ -57,7 +74,7 @@ public class ArvoreExpressoes {
 				i += numero.length() - 1;
 			}
 		}
-		// loop para adicionar parenteses
+		// loop para adicionar parenteses faltando
 		try {
 			while (lista.size() > 1) {
 				int fim = lista.indexOf(")");
@@ -84,6 +101,7 @@ public class ArvoreExpressoes {
 		for (int i = 0; i < lista.size(); i++) {
 			fila.enqueue(lista.get(i).toString());
 		}
+		// converte a fila de simbolos em uma arvore de expressoes
 		tradutorDeExpressoes(fila);
 	}
 
@@ -145,10 +163,10 @@ public class ArvoreExpressoes {
 		return lista;
 	}
 
-	// junta caracteres que representam um numero ou variavel em uma string
+	// junta caracteres que representam um numero ou nome variavel em uma string
 	private String extractNumber(String expressao, int inicio) {
 		String numero = expressao.charAt(inicio) + "";
-		// concatena atÃƒÂ© encontrar parenteses, operadores ou espaÃƒÂ§o
+		// concatena ate encontrar parenteses, operadores ou espaco
 		for (int i = inicio + 1; i < expressao.length(); i++) {
 			if ((operadores + "( )").contains(expressao.charAt(i) + ""))
 				break;
@@ -257,7 +275,7 @@ public class ArvoreExpressoes {
 				especialOperator = false;
 			}
 		}
-		if(!operators.isEmpty())
+		if (!operators.isEmpty())
 			throw new ExpressaoMalFormadaException("Existem operadores sobrando");
 		// a arvore de expressao criada e deve ser a atual, logo se adiciona o
 		// node guardado na pilha de subExpressoes na Arvore de Expressoes
@@ -343,6 +361,7 @@ public class ArvoreExpressoes {
 		return null;
 	}
 
+	// verifica se a expressao esta escrita corretamente
 	private void validarExpressao(String expressao) {
 		Pilha<Character> pilha = new PilhaArray<Character>();
 		boolean expressaoInvalida = false;
@@ -409,11 +428,15 @@ public class ArvoreExpressoes {
 
 	// calcula a raiz de indice indice usando o metodo de newton
 	private BigDecimal raiz(BigDecimal valor, int indice) {
-		if (valor.compareTo(BigDecimal.ZERO) < 0 && indice % 2 == 0) {
+		boolean negativo = false;
+		if (valor.compareTo(BigDecimal.ZERO) < 0)
+			negativo = true;
+		if (negativo && indice % 2 == 0) {
 			throw new ArithmeticException("raiz par de numero negativo");
 		} else if (indice == 1) {
 			return valor;
 		}
+		valor = valor.abs();
 		Fila<Integer> fatores = new FilaArray<Integer>();
 		int i = 2;
 		while (indice >= i) {
@@ -442,6 +465,8 @@ public class ArvoreExpressoes {
 			} while (lastCorrectDigit < precisao);
 			valor = resultado.setScale(precisao, roundingMode).stripTrailingZeros();
 		}
+		if (negativo)
+			valor = valor.negate();
 		return valor.setScale(precisao, roundingMode).stripTrailingZeros();
 	}
 
