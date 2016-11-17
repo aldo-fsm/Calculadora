@@ -329,6 +329,7 @@ public class ArvoreExpressoes {
 		return "";
 	}
 
+	// metodo recursivo para o calculo da expressao
 	private Racional auxCalcularExpressao(Node<String> raiz, Lista<String> variaveis,
 			Lista<Racional> valoresCorrespondentes) {
 		if (raiz != null) {
@@ -341,29 +342,38 @@ public class ArvoreExpressoes {
 				throw new ExpressaoMalFormadaException(
 						"Operador " + raiz.getElemento() + " nao possui interpretacao unaria");
 			}
+			Racional retorno;
 			switch (raiz.getElemento()) {
+			// multiplicacao
 			case "*":
 				return expressao1.multiplicar(expressao2);
+			// divisao
 			case "/":
 				return expressao1.dividir(expressao2);
+			// subtracao
 			case "-":
 				if (expressao1 == null)
 					return Racional.ZERO.subtrair(expressao2);
 				return expressao1.subtrair(expressao2);
+			// adicao
 			case "+":
 				if (expressao1 == null)
 					return Racional.ZERO.somar(expressao2);
 				return expressao1.somar(expressao2);
+			// potenciacao
 			case "^":
-				Racional retorno = Racional.valueOf(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
+				retorno = Racional.valueOf(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
 						expressao2.getDenominador().intValue()));
 				retorno = retorno.pow(expressao2.getNumerador().intValue());
 				return retorno;
+			// raiz
 			case "~":
-				if (expressao2.compareTo(Racional.ZERO) < 0)
-					expressao1 = expressao1.inverso();
-				return Racional.valueOf(
-						raiz(expressao1.bigDecimalValue(mathContext.getPrecision()), expressao2.abs().intValue()));
+				expressao2 = expressao2.inverso();
+				retorno = Racional.valueOf(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
+						expressao2.getDenominador().intValue()));
+				retorno = retorno.pow(expressao2.getNumerador().intValue());
+				return retorno;
+			// resto
 			case "%":
 				return expressao1.resto(expressao2);
 			}
