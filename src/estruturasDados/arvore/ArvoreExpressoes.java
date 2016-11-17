@@ -45,19 +45,39 @@ public class ArvoreExpressoes {
 	 */
 	@SuppressWarnings("unchecked")
 	public void armazenarExpressao(String expressao) {
+		ArrayList<Object> lista = corretor(expressao);
+		Fila<String> fila = new FilaArray<String>();
+		if (lista.get(0) instanceof ArrayList) {
+			lista = (ArrayList<Object>) lista.get(0);
+		} else {
+			Object aux = lista.get(0);
+			lista = new ArrayList<Object>();
+			lista.add(aux);
+		}
+		for (int i = 0; i < lista.size(); i++) {
+			fila.enqueue(lista.get(i).toString());
+		}
+		// converte a fila de simbolos em uma arvore de expressoes
+		putOnTree(fila);
+	}
 
+	/**
+	 * metodo recebe uma expressao e acrescenta a ela os tratamentos possiveis,
+	 * como parenteses associativos em expressoes que nao os possuem como
+	 * (2+2+2)
+	 * 
+	 * @param expressao
+	 *            Expressão em notação infixa
+	 */
+	private ArrayList<Object> corretor(String expressao) {
 		// verifica se a expressao esta escrita corretamente
 		validarExpressao(expressao);
-
 		expressao = "(" + expressao + ")";
-
 		// lista de simbolos
 		ArrayList<Object> lista = new ArrayList<Object>();
-
 		// coloca cada simbolo numa lista, agrupando numeros e nomes de
 		// variaveis em strings
 		for (int i = 0; i < expressao.length(); i++) {
-
 			// ignora espaços
 			if (expressao.charAt(i) == ' ') {
 				continue;
@@ -90,22 +110,18 @@ public class ArvoreExpressoes {
 		} catch (RuntimeException e) {
 			throw new ExpressaoMalFormadaException();
 		}
-		Fila<String> fila = new FilaArray<String>();
-		if (lista.get(0) instanceof ArrayList) {
-			lista = (ArrayList<Object>) lista.get(0);
-		} else {
-			Object aux = lista.get(0);
-			lista = new ArrayList<Object>();
-			lista.add(aux);
-		}
-		for (int i = 0; i < lista.size(); i++) {
-			fila.enqueue(lista.get(i).toString());
-		}
-		// converte a fila de simbolos em uma arvore de expressoes
-		tradutorDeExpressoes(fila);
+		return lista;
 	}
 
-	// coloca parenteses de acordo com a precedencia dos operadores
+	/**
+	 * coloca parenteses de acordo com a precedencia dos operadores utilizando
+	 * um loop no corretor
+	 * 
+	 * @expressao representa a lista a ser tratada (que inicialmente era a
+	 *            expressao digitada pelo usuario)
+	 * @inicio , @fim variaveis que limitaram a analise da lista e o acrescimo
+	 *         relativo adequado
+	 */
 	private void adicionarParenteses(List<Object> expressao, int inicio, int fim) {
 		int i = 0;
 		boolean isNotBinary = false;
@@ -179,6 +195,7 @@ public class ArvoreExpressoes {
 		return auxExpressaoEmOrdem(root);
 	}
 
+	// metodo utilizado em calcularExpressao para informar variaveis
 	public void informarVariaveis() {
 		Lista<String> variaveis = new ListaArray<String>();
 		Lista<String> valoresCorrespondentes = new ListaArray<String>();
@@ -191,6 +208,7 @@ public class ArvoreExpressoes {
 	 * @return O resultado da expressao
 	 */
 	public Racional calcularExpressao() {
+		informarVariaveis();
 		Racional.setBigDecimalConversionPrecision(mathContext.getPrecision());
 		if (root.getLeftNode() == null && root.getRightNode() == null)
 			return new Racional(root.getElemento());
@@ -208,11 +226,14 @@ public class ArvoreExpressoes {
 		mathContext = new MathContext(precision, mathContext.getRoundingMode());
 	}
 
-	// converte uma fila de simbolos(parenteses, operadores, valores e
-	// variaveis) em uma arvore de expressaoes
-	private void tradutorDeExpressoes(Fila<String> expressao) {
-
-		root = null;
+	/**
+	 * converte uma fila de simbolos(parenteses, operadores, valores e
+	 * variaveis) em uma arvore de expressaoes
+	 * 
+	 * @expressao representa a expressao digitada pelo usuario no formato de
+	 *            fila, mais adequado para o metodo
+	 */
+	private void putOnTree(Fila<String> expressao) {
 		// pilhas de operadores e de expressoes (arvores) que irao servir para
 		// costruir a arvore de expressao
 		Pilha<String> operators = new PilhaArray<String>();
@@ -292,7 +313,7 @@ public class ArvoreExpressoes {
 			throw new ExpressaoMalFormadaException("Existem operadores sobrando");
 		// a arvore de expressao criada e deve ser a atual, logo se adiciona o
 		// node guardado na pilha de subExpressoes na Arvore de Expressoes
-		adicionarNode(subExpres.pop());
+		root = subExpres.pop();
 	}
 
 	// metodo recursivo para percusso em ordem
@@ -308,68 +329,43 @@ public class ArvoreExpressoes {
 		return "";
 	}
 
-	private void adicionarNode(Node<String> novoElemento) {
-		if (root == null) {
-			root = novoElemento;
-		} else if (root.getRightNode() == null) {
-			root.setRightNode(novoElemento);
-		} else if (root.getLeftNode() == null) {
-			root.setLeftNode(novoElemento);
-		}
-	}
-
 	private Racional auxCalcularExpressao(Node<String> raiz, Lista<String> variaveis,
 			Lista<Racional> valoresCorrespondentes) {
 		if (raiz != null) {
-			if (root != null) {
-				if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
-					String numOper = "0123456789" + operadores;
-					if (numOper.indexOf(raiz.getElemento().charAt(0)) == -1) {
-						if (variaveis.contem(raiz.getElemento().charAt(0) + "")) {
-							return valoresCorrespondentes.get(variaveis.indexOf(raiz.getElemento().charAt(0) + ""));
-						} else {
-							scanner = new Scanner(System.in);
-							variaveis.adicionar(raiz.getElemento().charAt(0) + "");
-							System.out.println("informe o valor de " + raiz.getElemento().charAt(0));
-							Racional tmp = new Racional(scanner.nextLine());
-							valoresCorrespondentes.adicionar(tmp);
-							return tmp;
-						}
-					}
-					return new Racional(raiz.getElemento());
-				}
-				Racional expressao1 = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
-				Racional expressao2 = auxCalcularExpressao(raiz.getRightNode(), variaveis, valoresCorrespondentes);
-				if (expressao1 == null && !(raiz.getElemento().equals("-") || raiz.getElemento().equals("+"))) {
-					throw new ExpressaoMalFormadaException(
-							"Operador " + raiz.getElemento() + " nao possui interpretacao unaria");
-				}
-				switch (raiz.getElemento()) {
-				case "*":
-					return expressao1.multiplicar(expressao2);
-				case "/":
-					return expressao1.dividir(expressao2);
-				case "-":
-					if (expressao1 == null)
-						return Racional.ZERO.subtrair(expressao2);
-					return expressao1.subtrair(expressao2);
-				case "+":
-					if (expressao1 == null)
-						return Racional.ZERO.somar(expressao2);
-					return expressao1.somar(expressao2);
-				case "^":
-					Racional retorno = Racional.valueOf(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
-							expressao2.getDenominador().intValue()));
-					retorno = retorno.pow(expressao2.getNumerador().intValue());
-					return retorno;
-				case "~":
-					if (expressao2.compareTo(Racional.ZERO) < 0)
-						expressao1 = expressao1.inverso();
-					return Racional.valueOf(
-							raiz(expressao1.bigDecimalValue(mathContext.getPrecision()), expressao2.abs().intValue()));
-				case "%":
-					return expressao1.resto(expressao2);
-				}
+			if (raiz.getLeftNode() == null && raiz.getRightNode() == null) {
+				return new Racional(raiz.getElemento());
+			}
+			Racional expressao1 = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
+			Racional expressao2 = auxCalcularExpressao(raiz.getRightNode(), variaveis, valoresCorrespondentes);
+			if (expressao1 == null && !(raiz.getElemento().equals("-") || raiz.getElemento().equals("+"))) {
+				throw new ExpressaoMalFormadaException(
+						"Operador " + raiz.getElemento() + " nao possui interpretacao unaria");
+			}
+			switch (raiz.getElemento()) {
+			case "*":
+				return expressao1.multiplicar(expressao2);
+			case "/":
+				return expressao1.dividir(expressao2);
+			case "-":
+				if (expressao1 == null)
+					return Racional.ZERO.subtrair(expressao2);
+				return expressao1.subtrair(expressao2);
+			case "+":
+				if (expressao1 == null)
+					return Racional.ZERO.somar(expressao2);
+				return expressao1.somar(expressao2);
+			case "^":
+				Racional retorno = Racional.valueOf(raiz(expressao1.bigDecimalValue(mathContext.getPrecision()),
+						expressao2.getDenominador().intValue()));
+				retorno = retorno.pow(expressao2.getNumerador().intValue());
+				return retorno;
+			case "~":
+				if (expressao2.compareTo(Racional.ZERO) < 0)
+					expressao1 = expressao1.inverso();
+				return Racional.valueOf(
+						raiz(expressao1.bigDecimalValue(mathContext.getPrecision()), expressao2.abs().intValue()));
+			case "%":
+				return expressao1.resto(expressao2);
 			}
 		}
 		return null;
@@ -488,6 +484,7 @@ public class ArvoreExpressoes {
 		return valor.setScale(precisao, roundingMode).stripTrailingZeros();
 	}
 
+	// metodo ira auxiliar o calculo da raiz
 	private int firstDifferentDigit(BigDecimal a, BigDecimal b) {
 		String strA = a.toString();
 		String strB = b.toString();
@@ -499,4 +496,5 @@ public class ArvoreExpressoes {
 		}
 		return i;
 	}
+
 }
