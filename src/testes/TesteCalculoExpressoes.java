@@ -27,6 +27,7 @@ public class TesteCalculoExpressoes {
 					System.out.printf(">>> ");
 					input = s.nextLine();
 					calculadora.acrescentaNaExpressao(input);
+					calculadora.informarVariaveis();
 					System.out.println(calculadora.expressaoEmOrdem() + " = " + calculadora.calcularExpressao());
 					break;
 				case "exit":
@@ -40,6 +41,7 @@ public class TesteCalculoExpressoes {
 					break;
 				default:
 					calculadora.armazenarExpressao(input);
+					calculadora.informarVariaveis();
 					System.out.println(calculadora.expressaoEmOrdem() + " = " + calculadora.calcularExpressao());
 					break;
 				}
