@@ -23,7 +23,7 @@ public class ArvoreExpressoes {
 	// determina a precisao e o modo de arredondamento
 	private MathContext mathContext = new MathContext(100, RoundingMode.HALF_EVEN);
 	// operadores em ordem de precedencia
-	private static final String operadores = "^~*%/-+";
+	private static final String operadores = "!^~*%/-+";
 
 	/**
 	 * acrescenta uma expressao exemplo: ((2*3)+5) acrescentar *3 + 5 =>
@@ -95,21 +95,21 @@ public class ArvoreExpressoes {
 			}
 		}
 		// loop para adicionar parenteses faltando
-		try {
-			while (lista.size() > 1) {
-				int fim = lista.indexOf(")");
-				int inicio;
-				for (inicio = fim; inicio > 0; inicio--) {
-					if (lista.get(inicio).equals("("))
-						break;
-				}
-				lista.remove(inicio);
-				lista.remove(fim - 1);
-				adicionarParenteses(lista, inicio, fim - 1);
+		// try {
+		while (lista.size() > 1) {
+			int fim = lista.indexOf(")");
+			int inicio;
+			for (inicio = fim; inicio > 0; inicio--) {
+				if (lista.get(inicio).equals("("))
+					break;
 			}
-		} catch (RuntimeException e) {
-			throw new ExpressaoMalFormadaException();
+			lista.remove(inicio);
+			lista.remove(fim - 1);
+			adicionarParenteses(lista, inicio, fim - 1);
 		}
+		// } catch (RuntimeException e) {
+		// throw new ExpressaoMalFormadaException();
+		// }
 		return lista;
 	}
 
@@ -132,7 +132,12 @@ public class ArvoreExpressoes {
 					: inicio + subExpressao.indexOf(operador + "");
 			if (index >= inicio && index < fim) {
 				isNotBinary = index == inicio || (operadores + "(").contains(expressao.get(index - 1).toString());
-				if (isNotBinary) {
+				if (operador == '!') {
+					expressao.add(index, listConcat("(", expressao.get(index - 1), operador, ")"));
+					expressao.remove(index - 1);
+					expressao.remove(index);
+					fim--;
+				} else if (isNotBinary) {
 					expressao.add(index, listConcat(operador, expressao.get(index + 1)));
 					expressao.remove(index + 1);
 					expressao.remove(index + 1);
@@ -265,7 +270,11 @@ public class ArvoreExpressoes {
 				especialOperator = true;
 				// caso seja um operador
 			} else if (operadores.contains(termo)) {
-				if (especialOperator) {
+				if (termo.contains("!")) {
+					Node<String> subExpressaoAux = new Node<String>(termo);
+					subExpressaoAux.setLeftNode(subExpres.pop());
+					subExpres.push(subExpressaoAux);
+				} else if (especialOperator) {
 					operadorEspecial = termo;
 					// todo e qualquer operador apos o especial deve ser um
 					// operador normal (por hora)
@@ -276,25 +285,27 @@ public class ArvoreExpressoes {
 				}
 				// caso seja um parenteses fechando
 			} else if (termo.equals(")")) {
-				Node<String> subExpressaoAux = new Node<String>(operators.pop());
-				subExpressaoAux.setRightNode(subExpres.pop());
-				subExpressaoAux.setLeftNode(subExpres.pop());
-				if (!maisQueEspecial.isEmpty()) {
-					boolean entrou = false;
-					for (int i = 0; i < maisQueEspecial.size(); i++) {
-						niveis.set(i, niveis.get(i) - 1);
-						if (niveis.get(i) == 0) {
-							maisQueEspecial.get(i).setRightNode(subExpressaoAux);
-							subExpres.push(maisQueEspecial.get(i));
-							maisQueEspecial.set(i, new Node<String>(null));
-							entrou = true;
+				if (!operators.isEmpty()) {
+					Node<String> subExpressaoAux = new Node<String>(operators.pop());
+					subExpressaoAux.setRightNode(subExpres.pop());
+					subExpressaoAux.setLeftNode(subExpres.pop());
+					if (!maisQueEspecial.isEmpty()) {
+						boolean entrou = false;
+						for (int i = 0; i < maisQueEspecial.size(); i++) {
+							niveis.set(i, niveis.get(i) - 1);
+							if (niveis.get(i) == 0) {
+								maisQueEspecial.get(i).setRightNode(subExpressaoAux);
+								subExpres.push(maisQueEspecial.get(i));
+								maisQueEspecial.set(i, new Node<String>(null));
+								entrou = true;
+							}
 						}
-					}
-					if (!entrou)
+						if (!entrou)
+							subExpres.push(subExpressaoAux);
+					} else
 						subExpres.push(subExpressaoAux);
-				} else
-					subExpres.push(subExpressaoAux);
-				especialOperator = false;
+					especialOperator = false;
+				}
 				// caso seja um valor (numero ou variavel)
 			} else {
 				Node<String> valor = new Node<String>();
@@ -338,9 +349,16 @@ public class ArvoreExpressoes {
 			}
 			Racional expressao1 = auxCalcularExpressao(raiz.getLeftNode(), variaveis, valoresCorrespondentes);
 			Racional expressao2 = auxCalcularExpressao(raiz.getRightNode(), variaveis, valoresCorrespondentes);
-			if (expressao1 == null && !(raiz.getElemento().equals("-") || raiz.getElemento().equals("+"))) {
+			if (expressao1 == null && !("-+".contains(raiz.getElemento()))) {
+				if ("!".contains(raiz.getElemento())) {
+					throw new ExpressaoMalFormadaException(raiz.getElemento() + "e unario a direita");
+				} else {
+					throw new ExpressaoMalFormadaException(
+							"Operador " + raiz.getElemento() + " nao possui interpretacao unaria");
+				}
+			} else if (expressao2 != null && "!".contains(raiz.getElemento())) {
 				throw new ExpressaoMalFormadaException(
-						"Operador " + raiz.getElemento() + " nao possui interpretacao unaria");
+						"Operador " + raiz.getElemento() + " nao possui interpretacao binaria");
 			}
 			Racional retorno;
 			switch (raiz.getElemento()) {
@@ -376,9 +394,19 @@ public class ArvoreExpressoes {
 			// resto
 			case "%":
 				return expressao1.resto(expressao2);
+			case "!":
+				return Racional.valueOf(fatorial(expressao1.bigDecimalValue()));
 			}
 		}
 		return null;
+	}
+	
+	private BigDecimal fatorial(BigDecimal valor){
+		if(valor.compareTo(BigDecimal.ONE) <= 0){
+			return BigDecimal.ONE;
+		}else{
+			return valor.multiply(fatorial(valor.subtract(BigDecimal.ONE)));
+		}
 	}
 
 	// verifica se a expressao esta escrita corretamente
