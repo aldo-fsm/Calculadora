@@ -279,43 +279,25 @@ public class ArvoreExpressoes {
 					operators.push(termo);
 					especialOperator = true;
 				}
-
-			}
-			// caso seja fatorial
-			else if (termo.contains("!")) {
-				Node<String> subExpressaoAux = new Node<String>(termo);
-				subExpressaoAux.setLeftNode(subExpres.pop());
-				subExpres.push(subExpressaoAux);
-				especialOperator = false;
-				if (!maisQueEspecial.isEmpty()) {
-					for (int i = 0; i < maisQueEspecial.size(); i++) {
-						niveis.set(i, niveis.get(i) - 1);
-						if (niveis.get(i) == 0) {
-							maisQueEspecial.get(i).setRightNode(subExpres.pop());
-							subExpres.push(maisQueEspecial.get(i));
-							maisQueEspecial.set(i, new Node<String>(null));
-						}
-					}
-				}
-				// caso seja um parenteses fechando
-			} else if (termo.equals(")")) {
-				if (!operators.isEmpty()) {
-					Node<String> subExpressaoAux = new Node<String>(operators.pop());
+			// caso seja fatorial ou parenteses fechando
+			} else if (termo.equals(")")||termo.contains("!")) {
+					Node<String> subExpressaoAux = termo.contains("!")?new Node<String>(termo):new Node<String>(operators.pop());
+					if(!termo.contains("!"))
 					subExpressaoAux.setRightNode(subExpres.pop());
 					subExpressaoAux.setLeftNode(subExpres.pop());
 					especialOperator = false;
 					subExpres.push(subExpressaoAux);
-				}
-				if (!maisQueEspecial.isEmpty()) {
-					for (int i = 0; i < maisQueEspecial.size(); i++) {
-						niveis.set(i, niveis.get(i) - 1);
-						if (niveis.get(i) == 0) {
-							maisQueEspecial.get(i).setRightNode(subExpres.pop());
-							subExpres.push(maisQueEspecial.get(i));
-							maisQueEspecial.set(i, new Node<String>(null));
+					if (!maisQueEspecial.isEmpty()) {
+						for (int i = 0; i < maisQueEspecial.size(); i++) {
+							niveis.set(i, niveis.get(i) - 1);
+							if (niveis.get(i) == 0) {
+								maisQueEspecial.get(i).setRightNode(subExpres.pop());
+								subExpres.push(maisQueEspecial.get(i));
+								maisQueEspecial.set(i, new Node<String>(null));
+							}
 						}
 					}
-				}
+					if(termo.contains("!"))expressao.dequeue();
 				// caso seja um valor (numero ou variavel)
 			} else {
 				Node<String> valor = new Node<String>();
@@ -329,12 +311,10 @@ public class ArvoreExpressoes {
 				subExpres.push(valor);
 				especialOperator = false;
 			}
-		}
-		if (!operators.isEmpty())
-			throw new ExpressaoMalFormadaException("Existem operadores sobrando");
-		// a arvore de expressao criada e deve ser a atual, logo se adiciona o
-		// node guardado na pilha de subExpressoes na Arvore de Expressoes
-		root = subExpres.pop();
+		}if(!operators.isEmpty())throw new ExpressaoMalFormadaException("Existem operadores sobrando");
+	// a arvore de expressao criada e deve ser a atual, logo se adiciona o
+	// node guardado na pilha de subExpressoes na Arvore de Expressoes
+	root=subExpres.pop();
 
 	}
 
