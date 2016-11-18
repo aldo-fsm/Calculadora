@@ -269,12 +269,8 @@ public class ArvoreExpressoes {
 					}
 				especialOperator = true;
 				// caso seja um operador
-			} else if (operadores.contains(termo)) {
-				if (termo.contains("!")) {
-					Node<String> subExpressaoAux = new Node<String>(termo);
-					subExpressaoAux.setLeftNode(subExpres.pop());
-					subExpres.push(subExpressaoAux);
-				} else if (especialOperator) {
+			} else if (operadores.contains(termo) && !termo.contains("!")) {
+				if (especialOperator) {
 					operadorEspecial = termo;
 					// todo e qualquer operador apos o especial deve ser um
 					// operador normal (por hora)
@@ -282,6 +278,24 @@ public class ArvoreExpressoes {
 				} else {
 					operators.push(termo);
 					especialOperator = true;
+				}
+
+			}
+			// caso seja fatorial
+			else if (termo.contains("!")) {
+				Node<String> subExpressaoAux = new Node<String>(termo);
+				subExpressaoAux.setLeftNode(subExpres.pop());
+				subExpres.push(subExpressaoAux);
+				especialOperator = false;
+				if (!maisQueEspecial.isEmpty()) {
+					for (int i = 0; i < maisQueEspecial.size(); i++) {
+						niveis.set(i, niveis.get(i) - 1);
+						if (niveis.get(i) == 0) {
+							maisQueEspecial.get(i).setRightNode(subExpres.pop());
+							subExpres.push(maisQueEspecial.get(i));
+							maisQueEspecial.set(i, new Node<String>(null));
+						}
+					}
 				}
 				// caso seja um parenteses fechando
 			} else if (termo.equals(")")) {
@@ -321,6 +335,7 @@ public class ArvoreExpressoes {
 		// a arvore de expressao criada e deve ser a atual, logo se adiciona o
 		// node guardado na pilha de subExpressoes na Arvore de Expressoes
 		root = subExpres.pop();
+
 	}
 
 	// metodo recursivo para percusso em ordem
