@@ -289,22 +289,18 @@ public class ArvoreExpressoes {
 					Node<String> subExpressaoAux = new Node<String>(operators.pop());
 					subExpressaoAux.setRightNode(subExpres.pop());
 					subExpressaoAux.setLeftNode(subExpres.pop());
-					if (!maisQueEspecial.isEmpty()) {
-						boolean entrou = false;
-						for (int i = 0; i < maisQueEspecial.size(); i++) {
-							niveis.set(i, niveis.get(i) - 1);
-							if (niveis.get(i) == 0) {
-								maisQueEspecial.get(i).setRightNode(subExpressaoAux);
-								subExpres.push(maisQueEspecial.get(i));
-								maisQueEspecial.set(i, new Node<String>(null));
-								entrou = true;
-							}
-						}
-						if (!entrou)
-							subExpres.push(subExpressaoAux);
-					} else
-						subExpres.push(subExpressaoAux);
 					especialOperator = false;
+					subExpres.push(subExpressaoAux);
+				}
+				if (!maisQueEspecial.isEmpty()) {
+					for (int i = 0; i < maisQueEspecial.size(); i++) {
+						niveis.set(i, niveis.get(i) - 1);
+						if (niveis.get(i) == 0) {
+							maisQueEspecial.get(i).setRightNode(subExpres.pop());
+							subExpres.push(maisQueEspecial.get(i));
+							maisQueEspecial.set(i, new Node<String>(null));
+						}
+					}
 				}
 				// caso seja um valor (numero ou variavel)
 			} else {
@@ -400,11 +396,11 @@ public class ArvoreExpressoes {
 		}
 		return null;
 	}
-	
-	private BigDecimal fatorial(BigDecimal valor){
-		if(valor.compareTo(BigDecimal.ONE) <= 0){
+
+	private BigDecimal fatorial(BigDecimal valor) {
+		if (valor.compareTo(BigDecimal.ONE) <= 0) {
 			return BigDecimal.ONE;
-		}else{
+		} else {
 			return valor.multiply(fatorial(valor.subtract(BigDecimal.ONE)));
 		}
 	}
