@@ -1,6 +1,7 @@
 package estruturasDados.arvore;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import estruturasDados.lista.ListaArray;
 import estruturasDados.pilha.Pilha;
 import estruturasDados.pilha.PilhaArray;
 import exceptions.ExpressaoMalFormadaException;
+import numeros.RMath;
 import numeros.Racional;
 
 public class ArvoreExpressoes {
@@ -390,19 +392,10 @@ public class ArvoreExpressoes {
 			case "%":
 				return expressao1.resto(expressao2);
 			case "!":
-				return Racional.valueOf(fatorial(expressao1.bigDecimalValue()));
+				return RMath.fatorial(expressao1);
 			}
 		}
 		return null;
-	}
-
-	private BigDecimal fatorial(BigDecimal valor) {
-		BigDecimal resultado = BigDecimal.ONE;
-		while (valor.compareTo(BigDecimal.ONE) > 0) {
-			resultado = resultado.multiply(valor);
-			valor = valor.subtract(BigDecimal.ONE);
-		}
-		return resultado;
 	}
 
 	// verifica se a expressao esta escrita corretamente

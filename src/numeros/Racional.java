@@ -211,6 +211,14 @@ public class Racional extends Number implements Comparable<Racional> {
 		return new Racional(numero.toString());
 	}
 
+	public static Racional valueOf(BigInteger numero) {
+		return new Racional(numero, BigInteger.ONE);
+	}
+
+	public boolean isInteger() {
+		return denominador.equals(BigInteger.ONE);
+	}
+
 	public static int getBigDecimalConversionPrecision() {
 		return bigDecimalConversionPrecision;
 	}
