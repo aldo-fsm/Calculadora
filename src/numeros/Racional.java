@@ -216,7 +216,7 @@ public class Racional extends Number implements Comparable<Racional> {
 	}
 
 	public boolean isInteger() {
-		return denominador.equals(BigInteger.ONE);
+		return denominador.abs().compareTo(BigInteger.ONE) == 0;
 	}
 
 	public static int getBigDecimalConversionPrecision() {

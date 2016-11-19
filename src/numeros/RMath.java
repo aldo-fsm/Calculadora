@@ -13,7 +13,7 @@ public class RMath {
 	public static Racional fatorial(Racional valor) {
 		if (valor.isInteger()) {
 			BigInteger aux = valor.bigIntegerValue();
-			if (aux.compareTo(BigInteger.ZERO) > 0) {
+			if (aux.compareTo(BigInteger.ZERO) >= 0) {
 				BigInteger resultado = BigInteger.ONE;
 				while (aux.compareTo(BigInteger.ONE) > 0) {
 					resultado = resultado.multiply(aux);
